@@ -6,11 +6,13 @@
 
 ## Problem
 
-AI systems are commonly given whole records: a support ticket, application, or customer profile. These records can contain direct identifiers and sensitive context that are irrelevant to the requested decision.
+**How do we ensure privacy by design in AI systems, rather than bolt it on after the fact?**
 
-Most privacy tooling answers an important question: **what looks personal?** It detects, masks, pseudonymises, or redacts personal data after collection.
+Privacy by design means minimizing data use before processing, not filtering it afterwards. In practice, most AI systems fail this test: they are commonly given whole records — a support ticket, application, or customer profile — that can contain direct identifiers and sensitive context irrelevant to the requested decision.
 
-The missing question is: **does this specific AI task need this field at all?**
+Most privacy tooling answers an important but different question: **what looks personal?** It detects, masks, pseudonymises, or redacts personal data after collection, once it has already reached the system boundary. This is privacy by reaction, not privacy by design.
+
+The question we need to answer instead, upfront and by construction, is: **does this specific AI task need this field at all?**
 
 ## Solution
 
@@ -61,6 +63,23 @@ These approaches are complementary. A PII detector can help identify a field's p
 - **Output**: a before/after payload and evidence cards showing fields blocked or retained.
 
 All displayed measurements are real and reproducible. The demonstration data is synthetic.
+
+## Proof of concept
+
+The `poc/` folder implements the minimum viable demo above end to end:
+
+- `poc/data/synthetic_tickets.json` — 16 synthetic support tickets with the declared fields and an expected queue.
+- `poc/classifier.py` — the routing task. Uses the OpenAI API when `OPENAI_API_KEY` is set, otherwise falls back to a deterministic offline classifier so the demo runs with no key.
+- `poc/minimize.py` — runs the baseline, ablates each field one at a time, measures exact-match accuracy and tokens sent, and prints/saves an evidence card per field.
+
+Run it:
+
+```bash
+pip install -r poc/requirements.txt   # optional if you only use the offline fallback
+python poc/minimize.py
+```
+
+This prints one evidence card per field and writes the full report, including a before/after payload, to `poc/report.json`.
 
 ## Pitch
 
