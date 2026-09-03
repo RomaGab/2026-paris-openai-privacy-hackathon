@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="An interactive demonstration of evidence-based data minimization." />
+    <title>Necessity Certificate</title>
+    <style>
+      :root {
+        --bg: #f7f7f8;
+        --surface: #ffffff;
+        --surface-soft: #f2f2f2;
+        --ink: #0d0d0d;
+        --secondary: rgb(0 0 0 / 60%);
+        --tertiary: rgb(0 0 0 / 38%);
+        --border: rgb(0 0 0 / 8%);
+        --border-strong: rgb(0 0 0 / 12%);
+        --hover: rgb(0 0 0 / 4%);
+        --selected: rgb(0 0 0 / 6%);
+        --success: #138a63;
+        --success-soft: #eaf5ef;
+        --blocked: #8b8b8b;
+        --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #212121;
+          --surface: #2f2f2f;
+          --surface-soft: #292929;
+          --ink: #f2f2f2;
+          --secondary: rgb(255 255 255 / 70%);
+          --tertiary: rgb(255 255 255 / 46%);
+          --border: rgb(255 255 255 / 7%);
+          --border-strong: rgb(255 255 255 / 11%);
+          --hover: rgb(255 255 255 / 4%);
+          --selected: rgb(255 255 255 / 7%);
+          --success: #5dcaa5;
+          --success-soft: rgb(93 202 165 / 10%);
+          --blocked: #8a8a8a;
+        }
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      button { font: inherit; }
+
+      .page {
+        width: min(1000px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 42px 0 56px;
+      }
+
+      .intro {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 32px;
+        margin-bottom: 24px;
+      }
+
+      h1 {
+        max-width: 620px;
+        margin: 0;
+        font-size: clamp(30px, 4.2vw, 46px);
+        font-weight: 600;
+        line-height: 1.05;
+        letter-spacing: -.045em;
+        text-wrap: balance;
+      }
+
+      .task {
+        flex: 0 0 auto;
+        margin: 0 0 4px;
+        color: var(--secondary);
+        font-size: 13px;
+      }
+
+      .task strong { color: var(--ink); font-weight: 550; }
+
+      .outcomes {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        overflow: hidden;
+        margin-bottom: 16px;
+        border: 1px solid var(--border-strong);
+        border-radius: 12px;
+        background: var(--surface);
+      }
+
+      .outcome {
+        min-height: 98px;
+        padding: 22px 24px 18px;
+        border-left: 1px solid var(--border);
+      }
+
+      .outcome:first-child { border-left: 0; }
+
+      .outcome strong {
+        display: block;
+        font-size: 27px;
+        font-weight: 560;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -.035em;
+      }
+
+      .outcome span {
+        display: block;
+        margin-top: 6px;
+        color: var(--secondary);
+        font-size: 12px;
+      }
+
+      .comparison {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 56px minmax(0, .78fr);
+        align-items: stretch;
+        margin-top: 16px;
+      }
+
+      .payload {
+        overflow: hidden;
+        border: 1px solid var(--border-strong);
+        border-radius: 12px;
+        background: var(--surface);
+      }
+
+      .payload-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        min-height: 48px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .payload-title { font-size: 13px; font-weight: 570; }
+
+      .payload-count {
+        color: var(--tertiary);
+        font: 10px/1 var(--mono);
+      }
+
+      .field-list { margin: 0; padding: 4px 0; }
+
+      .field {
+        display: grid;
+        grid-template-columns: minmax(130px, .55fr) minmax(0, 1fr) 18px;
+        gap: 12px;
+        align-items: center;
+        min-height: 42px;
+        padding: 7px 15px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .field:last-child { border-bottom: 0; }
+
+      .field code {
+        overflow: hidden;
+        color: var(--secondary);
+        font: 11px/1.3 var(--mono);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .field-value {
+        min-width: 0;
+        overflow: hidden;
+        color: var(--ink);
+        font-size: 12px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .field.blocked .field-value {
+        color: var(--tertiary);
+        text-decoration: line-through;
+      }
+
+      .field-state {
+        display: grid;
+        width: 16px;
+        height: 16px;
+        place-items: center;
+        border-radius: 50%;
+        font-size: 10px;
+        line-height: 1;
+      }
+
+      .field.retained .field-state {
+        border: 1px solid var(--success);
+        color: var(--success);
+      }
+
+      .field.blocked .field-state {
+        background: var(--blocked);
+        color: white;
+      }
+
+      .arrow {
+        display: grid;
+        place-items: center;
+        color: var(--tertiary);
+      }
+
+      .arrow svg { width: 20px; height: 20px; }
+
+      .result-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-top: 16px;
+        padding: 14px 16px;
+        border: 1px solid var(--border-strong);
+        border-radius: 10px;
+        background: var(--success-soft);
+      }
+
+      .result-main {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 540;
+      }
+
+      .result-icon {
+        display: grid;
+        width: 20px;
+        height: 20px;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--success);
+        color: white;
+        font-size: 12px;
+      }
+
+      .result-note { color: var(--secondary); font-size: 12px; }
+
+      .evidence-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 18px;
+        padding: 9px 13px;
+        border: 1px solid var(--border-strong);
+        border-radius: 9px;
+        background: var(--surface);
+        color: var(--ink);
+        font-size: 12px;
+        font-weight: 530;
+        cursor: pointer;
+        transition: background-color 160ms ease, transform 160ms ease;
+      }
+
+      .evidence-toggle:hover { background: var(--hover); }
+      .evidence-toggle:active { transform: scale(.98); }
+      .evidence-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+      .evidence-toggle svg {
+        width: 14px;
+        height: 14px;
+        transition: transform 180ms ease;
+      }
+
+      .evidence-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+      .details {
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+      }
+
+      .details[hidden] { display: none; }
+
+      .details-title {
+        margin: 0 0 12px;
+        font-size: 15px;
+        font-weight: 580;
+      }
+
+      .details-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.6fr) minmax(280px, .7fr);
+        gap: 16px;
+        align-items: start;
+      }
+
+      .table-wrap,
+      .evidence-summary {
+        overflow: hidden;
+        border: 1px solid var(--border-strong);
+        border-radius: 12px;
+        background: var(--surface);
+      }
+
+      .table-scroll { overflow-x: auto; }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+      }
+
+      th, td {
+        padding: 9px 11px;
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        vertical-align: middle;
+      }
+
+      th:last-child, td:last-child { border-right: 0; }
+      tbody tr:last-child td { border-bottom: 0; }
+
+      th {
+        background: var(--surface-soft);
+        color: var(--secondary);
+        font-weight: 550;
+      }
+
+      .decision-row {
+        cursor: pointer;
+        transition: background-color 140ms ease;
+      }
+
+      .decision-row:hover { background: var(--hover); }
+      .decision-row.active { background: var(--selected); }
+      .decision-row:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+
+      .field-code { color: var(--ink); font: 10px/1.3 var(--mono); white-space: nowrap; }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 530;
+        white-space: nowrap;
+      }
+
+      .status-dot { width: 7px; height: 7px; border-radius: 50%; }
+      .status.keep { color: var(--success); }
+      .status.keep .status-dot { background: var(--success); }
+      .status.block { color: var(--secondary); }
+      .status.block .status-dot { background: var(--blocked); }
+
+      .evidence-summary h3 {
+        margin: 0;
+        padding: 11px 13px;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface-soft);
+        font-size: 12px;
+        font-weight: 560;
+      }
+
+      .evidence-summary dl { margin: 0; }
+
+      .evidence-row {
+        display: grid;
+        grid-template-columns: 104px minmax(0, 1fr);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .evidence-row:last-child { border-bottom: 0; }
+
+      .evidence-row dt,
+      .evidence-row dd {
+        margin: 0;
+        padding: 9px 11px;
+        font-size: 10px;
+        line-height: 1.45;
+      }
+
+      .evidence-row dt { border-right: 1px solid var(--border); color: var(--secondary); }
+      .evidence-row dd { color: var(--ink); }
+
+      .scope {
+        margin: 16px 0 0;
+        color: var(--tertiary);
+        font-size: 10px;
+        line-height: 1.45;
+      }
+
+      @media (max-width: 760px) {
+        .page { width: min(100% - 28px, 640px); padding-top: 28px; }
+        .intro { align-items: start; flex-direction: column; gap: 12px; }
+        h1 { font-size: 32px; }
+        .outcomes { grid-template-columns: 1fr; }
+        .outcome { min-height: 74px; border-top: 1px solid var(--border); border-left: 0; }
+        .outcome:first-child { border-top: 0; }
+        .comparison { grid-template-columns: 1fr; gap: 10px; }
+        .arrow { height: 30px; transform: rotate(90deg); }
+        .details-layout { grid-template-columns: 1fr; }
+        .table-wrap { overflow-x: auto; }
+        table { min-width: 620px; }
+        .result-bar { align-items: flex-start; flex-direction: column; gap: 7px; }
+      }
+
+      @media print {
+        :root { --bg: #fff; --surface: #fff; --ink: #0d0d0d; --secondary: rgb(0 0 0 / 60%); --border: rgb(0 0 0 / 8%); --border-strong: rgb(0 0 0 / 12%); }
+        .page { width: 100%; padding: 0; }
+        .evidence-toggle { display: none; }
+        .details[hidden] { display: block; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="intro">
+        <h1>AI needs context, not identity.</h1>
+        <p class="task">Task · <strong>Route a support ticket</strong></p>
+      </header>
+
+      <section class="outcomes" aria-label="Key results">
+        <div class="outcome">
+          <strong id="reductionMetric">9 → 2</strong>
+          <span>fields sent to the model</span>
+        </div>
+        <div class="outcome">
+          <strong id="accuracyMetric">100%</strong>
+          <span>routing accuracy preserved</span>
+        </div>
+        <div class="outcome">
+          <strong id="piiMetric">0</strong>
+          <span>direct identifiers exposed</span>
+        </div>
+      </section>
+
+      <section class="comparison" aria-label="Before and after data minimization">
+        <article class="payload">
+          <header class="payload-head">
+            <span class="payload-title">Before · full record</span>
+            <span class="payload-count" id="sourceCount">9 fields</span>
+          </header>
+          <div class="field-list" id="sourceFields"></div>
+        </article>
+
+        <div class="arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M5 12h13M14 7l5 5-5 5" />
+          </svg>
+        </div>
+
+        <article class="payload">
+          <header class="payload-head">
+            <span class="payload-title">After · minimum context</span>
+            <span class="payload-count" id="targetCount">2 fields</span>
+          </header>
+          <div class="field-list" id="targetFields"></div>
+        </article>
+      </section>
+
+      <div class="result-bar">
+        <div class="result-main">
+          <span class="result-icon" aria-hidden="true">✓</span>
+          <span id="resultText">7 fields blocked before the model call</span>
+        </div>
+        <span class="result-note">The routing decision stays unchanged.</span>
+      </div>
+
+      <button class="evidence-toggle" id="evidenceToggle" type="button" aria-expanded="false" aria-controls="evidenceDetails">
+        <span id="toggleLabel">View evidence</span>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="m4 6 4 4 4-4" />
+        </svg>
+      </button>
+
+      <section class="details" id="evidenceDetails" hidden>
+        <h2 class="details-title">Why each field was kept or blocked</h2>
+        <div class="details-layout">
+          <div class="table-wrap">
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Field</th>
+                    <th>Privacy cost</th>
+                    <th>Decision</th>
+                    <th>Impact without field</th>
+                  </tr>
+                </thead>
+                <tbody id="decisionRows"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <aside class="evidence-summary" aria-live="polite" aria-label="Evidence summary">
+            <h3>Evidence summary</h3>
+            <dl>
+              <div class="evidence-row">
+                <dt>Source field</dt>
+                <dd><code class="field-code" id="evidenceField">issue_description</code></dd>
+              </div>
+              <div class="evidence-row">
+                <dt>Test</dt>
+                <dd id="evidenceTest">Removed in 16 synthetic cases</dd>
+              </div>
+              <div class="evidence-row">
+                <dt>Observed effect</dt>
+                <dd id="evidenceEffect">7 routing decisions changed</dd>
+              </div>
+              <div class="evidence-row">
+                <dt>Accuracy</dt>
+                <dd id="evidenceAccuracy">100% → 56%</dd>
+              </div>
+              <div class="evidence-row">
+                <dt>Action</dt>
+                <dd id="evidenceAction">Retain for task outcome</dd>
+              </div>
+            </dl>
+          </aside>
+        </div>
+        <p class="scope">Evidence applies to the declared task, model, prompt, and synthetic test set—not every possible use.</p>
+      </section>
+    </main>
+
+    <script type="application/json" id="fallback-report">
+      {
+        "engine": "offline_rule_based",
+        "test_set_size": 16,
+        "baseline_accuracy": 1,
+        "evidence_cards": [
+          {"field":"issue_description","declared_purpose":"route a support ticket","privacy_cost":"task-relevant, not personal","counterfactual_test":"removed in 16 declared synthetic cases","observed_effect":"7 routing decisions changed","accuracy_with_field":"100%","accuracy_without_field":"56%","tokens_saved_per_pass":165,"operational_action":"retain: required for task outcome"},
+          {"field":"product_area","declared_purpose":"route a support ticket","privacy_cost":"task-relevant, not personal","counterfactual_test":"removed in 16 declared synthetic cases","observed_effect":"6 routing decisions changed","accuracy_with_field":"100%","accuracy_without_field":"62%","tokens_saved_per_pass":36,"operational_action":"retain: required for task outcome"},
+          {"field":"urgency","declared_purpose":"route a support ticket","privacy_cost":"task-relevant, not personal","counterfactual_test":"removed in 16 declared synthetic cases","observed_effect":"0 routing decisions changed","accuracy_with_field":"100%","accuracy_without_field":"100%","tokens_saved_per_pass":32,"operational_action":"block before the model call"},
+          {"field":"name","declared_purpose":"route a support ticket","privacy_cost":"direct identifier","counterfactual_test":"removed in 16 declared synthetic cases","observed_effect":"0 routing decisions changed","accuracy_with_field":"100%","accuracy_without_field":"100%","tokens_saved_per_pass":48,"operational_action":"block before the model call"},
+          {"field":"email","declared_purpose":"route a support ticket","privacy_cost":"direct identifier","counterfactual_test":"removed in 16 declared synthetic cases","observed_effect":"0 routing decisions changed","accuracy_with_field":"100%","accuracy_without_field":"100%","tokens_saved_per_pass":32,"operational_action":"block before the model call"},
+          {"field":"phone","declared_purpose":"route a support ticket","privacy_cost":"direct identifier","counterfactual_test":"removed in 16 declared synthetic cases","observed_effect":"0 routing decisions changed","accuracy_with_field":"100%","accuracy_without_field":"100%","tokens_saved_per_pass":85,"operational_action":"block before the model call"},
+          {"field":"date_of_birth","declared_purpose":"route a support ticket","privacy_cost":"quasi-identifier","counterfactual_test":"removed in 16 declared synthetic cases","observed_effect":"0 routing decisions changed","accuracy_with_field":"100%","accuracy_without_field":"100%","tokens_saved_per_pass":32,"operational_action":"block before the model call"},
+          {"field":"address","declared_purpose":"route a support ticket","privacy_cost":"direct identifier","counterfactual_test":"removed in 16 declared synthetic cases","observed_effect":"0 routing decisions changed","accuracy_with_field":"100%","accuracy_without_field":"100%","tokens_saved_per_pass":96,"operational_action":"block before the model call"},
+          {"field":"account_id","declared_purpose":"route a support ticket","privacy_cost":"direct identifier (linkable)","counterfactual_test":"removed in 16 declared synthetic cases","observed_effect":"0 routing decisions changed","accuracy_with_field":"100%","accuracy_without_field":"100%","tokens_saved_per_pass":32,"operational_action":"block before the model call"}
+        ],
+        "fields_retained": ["issue_description", "product_area"],
+        "fields_blocked": ["urgency", "name", "email", "phone", "date_of_birth", "address", "account_id"],
+        "example_before_after": {
+          "ticket_id": "T001",
+          "full_payload": {"issue_description":"Please help me, this is urgent.","product_area":"Billing","urgency":"high","name":"Alice Martin","email":"alice.martin@example.com","phone":"+33 6 12 34 56 78","date_of_birth":"1988-04-12","address":"12 Rue de Rivoli, 75001 Paris, France","account_id":"ACC-10234"},
+          "minimized_payload": {"issue_description":"Please help me, this is urgent.","product_area":"Billing"}
+        }
+      }
+    </script>
+
+    <script>
+      let report = JSON.parse(document.getElementById('fallback-report').textContent);
+      let selectedField = report.evidence_cards[0].field;
+
+      const escapeHtml = value => String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+
+      const isRetained = field => report.fields_retained.includes(field);
+
+      const privacyLabel = value => ({
+        'task-relevant, not personal': 'Task context',
+        'direct identifier': 'Direct identifier',
+        'quasi-identifier': 'Quasi-identifier',
+        'direct identifier (linkable)': 'Linkable identifier'
+      })[value] || value;
+
+      function fieldHtml(field, value, retained) {
+        return `<div class="field ${retained ? 'retained' : 'blocked'}">
+          <code>${escapeHtml(field)}</code>
+          <span class="field-value" title="${escapeHtml(value)}">${escapeHtml(value)}</span>
+          <span class="field-state" aria-label="${retained ? 'Retained' : 'Blocked'}">${retained ? '✓' : '−'}</span>
+        </div>`;
+      }
+
+      function statusHtml(retained) {
+        return `<span class="status ${retained ? 'keep' : 'block'}"><span class="status-dot" aria-hidden="true"></span>${retained ? 'Retain' : 'Block'}</span>`;
+      }
+
+      function renderStory() {
+        const before = report.example_before_after.full_payload;
+        const after = report.example_before_after.minimized_payload;
+        const total = report.evidence_cards.length;
+        const retained = report.fields_retained.length;
+        const exposedIdentifiers = report.evidence_cards.filter(card => isRetained(card.field) && card.privacy_cost.includes('identifier')).length;
+
+        document.getElementById('reductionMetric').textContent = `${total} → ${retained}`;
+        document.getElementById('accuracyMetric').textContent = `${Math.round(report.baseline_accuracy * 100)}%`;
+        document.getElementById('piiMetric').textContent = exposedIdentifiers;
+        document.getElementById('sourceCount').textContent = `${Object.keys(before).length} fields`;
+        document.getElementById('targetCount').textContent = `${Object.keys(after).length} fields`;
+        document.getElementById('resultText').textContent = `${report.fields_blocked.length} fields blocked before the model call`;
+        document.getElementById('sourceFields').innerHTML = Object.entries(before)
+          .map(([field, value]) => fieldHtml(field, value, isRetained(field)))
+          .join('');
+        document.getElementById('targetFields').innerHTML = Object.entries(after)
+          .map(([field, value]) => fieldHtml(field, value, true))
+          .join('');
+      }
+
+      function renderRegister() {
+        document.getElementById('decisionRows').innerHTML = report.evidence_cards.map(card => {
+          const retained = isRetained(card.field);
+          const accuracyDrop = parseInt(card.accuracy_with_field) - parseInt(card.accuracy_without_field);
+          return `<tr class="decision-row ${selectedField === card.field ? 'active' : ''}" data-field="${escapeHtml(card.field)}" tabindex="0" role="button" aria-label="Show evidence for ${escapeHtml(card.field)}">
+            <td><code class="field-code">${escapeHtml(card.field)}</code></td>
+            <td>${escapeHtml(privacyLabel(card.privacy_cost))}</td>
+            <td>${statusHtml(retained)}</td>
+            <td>${accuracyDrop ? `−${accuracyDrop} accuracy points` : 'No measured change'}</td>
+          </tr>`;
+        }).join('');
+
+        document.querySelectorAll('.decision-row').forEach(row => {
+          row.addEventListener('click', () => selectField(row.dataset.field));
+          row.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              selectField(row.dataset.field);
+            }
+          });
+        });
+      }
+
+      function selectField(field) {
+        const card = report.evidence_cards.find(item => item.field === field);
+        if (!card) return;
+        selectedField = field;
+        const retained = isRetained(field);
+        document.getElementById('evidenceField').textContent = card.field;
+        document.getElementById('evidenceTest').textContent = card.counterfactual_test.replace(/^removed/, 'Removed');
+        document.getElementById('evidenceEffect').textContent = card.observed_effect.replace(/^\w/, letter => letter.toUpperCase());
+        document.getElementById('evidenceAccuracy').textContent = `${card.accuracy_with_field} → ${card.accuracy_without_field}`;
+        document.getElementById('evidenceAction').textContent = retained
+          ? 'Retain for task outcome'
+          : `Block before model call · ${card.tokens_saved_per_pass} tokens saved`;
+        renderRegister();
+      }
+
+      const evidenceToggle = document.getElementById('evidenceToggle');
+      const evidenceDetails = document.getElementById('evidenceDetails');
+      evidenceToggle.addEventListener('click', () => {
+        const isOpen = evidenceToggle.getAttribute('aria-expanded') === 'true';
+        evidenceToggle.setAttribute('aria-expanded', String(!isOpen));
+        evidenceDetails.hidden = isOpen;
+        document.getElementById('toggleLabel').textContent = isOpen ? 'View evidence' : 'Hide evidence';
+      });
+
+      function render() {
+        renderStory();
+        renderRegister();
+        selectField(selectedField);
+      }
+
+      render();
+
+      fetch('./report.json', { cache: 'no-store' })
+        .then(response => response.ok ? response.json() : Promise.reject())
+        .then(latestReport => {
+          report = latestReport;
+          selectedField = report.evidence_cards[0]?.field || '';
+          render();
+        })
+        .catch(() => {});
+    </script>
+  </body>
+</html>
