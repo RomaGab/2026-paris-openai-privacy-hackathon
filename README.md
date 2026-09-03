@@ -112,6 +112,10 @@ python poc/leakage_simulation.py --events 10000 --threshold 0.01
 
 The project builds on established detection, governance, policy, and evaluation techniques. Its differentiated contribution is connecting a declared purpose, counterfactual task measurement, an enforced minimal payload, and a reproducible evidence certificate. See [MARKET_STUDY.md](MARKET_STUDY.md).
 
+## Product plan and principles
+
+[PRODUCT_PLAN.md](PRODUCT_PLAN.md) defines the two user journeys, Privacy Preflight principles, wizard screens, structured skill contract, benchmark requirements, report contents, and the scope gate for the minimum viable submission.
+
 ## Pitch
 
 > Existing tools find sensitive data. We turn task evidence into an enforced minimal AI context.
