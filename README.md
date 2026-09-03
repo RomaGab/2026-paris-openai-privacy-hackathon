@@ -1,4 +1,4 @@
-# Proof-Carrying Data Minimization
+# Necessity Certificate
 
 ## One-line pitch
 
@@ -24,7 +24,7 @@ For a declared purpose, such as routing a support ticket, the system tests every
 4. Block fields whose removal does not degrade the measured task outcome.
 5. Generate an auditable evidence card for every retained or removed field.
 
-The result is proof-carrying data minimization: a system that does not merely say, "we removed email," but attaches the observed evidence for doing so.
+The result is a Necessity Certificate: a system that does not merely say, "we removed email," but attaches the observed evidence for doing so.
 
 ## Evidence card
 
@@ -39,7 +39,7 @@ Operational action: block before the model call
 
 ## How it differs from PII filtering
 
-| PII filtering | Proof-Carrying Data Minimization |
+| PII filtering | Necessity Certificate |
 |---|---|
 | What data is personal? | Is this data necessary for the declared task? |
 | Detect or mask data | Test necessity and block unnecessary data before the model call |
@@ -81,8 +81,12 @@ python poc/minimize.py
 
 This prints one evidence card per field and writes the full report, including a before/after payload, to `poc/report.json`.
 
+## Market landscape
+
+The project builds on established detection, governance, policy, and evaluation techniques. Its differentiated contribution is connecting a declared purpose, counterfactual task measurement, an enforced minimal payload, and a reproducible evidence certificate. See [MARKET_STUDY.md](MARKET_STUDY.md).
+
 ## Pitch
 
-> Privacy tools can tell you what is personal. We prove what your AI does not need.
+> Existing tools find sensitive data. We turn task evidence into an enforced minimal AI payload.
 
 > Build AI that needs less, and show the evidence for every field it leaves behind.
