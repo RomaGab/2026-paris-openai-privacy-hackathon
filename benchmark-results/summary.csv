@@ -1,0 +1,9 @@
+"corpus","generated_at","engine","model","masker","test_set_size","variant","correct","total","accuracy","decision_changes_vs_full","improvements_vs_full","regressions_vs_full","input_tokens","token_reduction_vs_full","field_instances_sent","field_reduction_vs_full","raw_structured_pii_values_sent","raw_structured_pii_reduction_vs_full","accepted_without_review"
+"synthetic_tickets","2026-09-03T14:05:25.236758+00:00","openai:gpt-4o-mini","gpt-4o-mini","structured_field_masking",16,"full_context",15,16,0.9375,0,0,0,2383,0.0,144,0.0,96,0.0,true
+"synthetic_tickets","2026-09-03T14:05:25.236758+00:00","openai:gpt-4o-mini","gpt-4o-mini","structured_field_masking",16,"masking_only",15,16,0.9375,0,0,0,2272,0.04658,144,0.0,0,1.0,true
+"synthetic_tickets","2026-09-03T14:05:25.236758+00:00","openai:gpt-4o-mini","gpt-4o-mini","structured_field_masking",16,"minimum_context",15,16,0.9375,0,0,0,1312,0.449433,48,0.666667,0,1.0,true
+"synthetic_tickets","2026-09-03T14:05:25.236758+00:00","openai:gpt-4o-mini","gpt-4o-mini","structured_field_masking",16,"minimum_plus_masking",15,16,0.9375,0,0,0,1312,0.449433,48,0.666667,0,1.0,true
+"banking77","2026-09-03T14:29:10.588874+00:00","openai:gpt-4o-mini","gpt-4o-mini","structured_field_masking",50,"full_context",44,50,0.88,0,0,0,9921,0.0,450,0.0,300,0.0,true
+"banking77","2026-09-03T14:29:10.588874+00:00","openai:gpt-4o-mini","gpt-4o-mini","structured_field_masking",50,"masking_only",45,50,0.9,1,1,0,9371,0.055438,450,0.0,0,1.0,false
+"banking77","2026-09-03T14:29:10.588874+00:00","openai:gpt-4o-mini","gpt-4o-mini","structured_field_masking",50,"minimum_context",45,50,0.9,1,1,0,5764,0.41901,50,0.888889,0,1.0,false
+"banking77","2026-09-03T14:29:10.588874+00:00","openai:gpt-4o-mini","gpt-4o-mini","structured_field_masking",50,"minimum_plus_masking",45,50,0.9,1,1,0,5764,0.41901,50,0.888889,0,1.0,false

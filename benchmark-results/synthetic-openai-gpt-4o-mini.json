@@ -1,0 +1,1185 @@
+{
+  "run": {
+    "generated_at": "2026-09-03T14:05:25.236758+00:00",
+    "evidence_level": "real_model_run",
+    "engine": "openai:gpt-4o-mini",
+    "model": "gpt-4o-mini",
+    "masker": "structured_field_masking",
+    "test_set_size": 16,
+    "corpus": "poc/data/synthetic_tickets.json",
+    "corpus_sha256": "21790fd5fd7c2b6da8b0f1c8e8181bdd34877d2281b2124c76125afde0b9f8d1",
+    "prompt_sha256": "ce132f54914817b82aba24197101ed9cf1b35c8b629c9c7edb68169abacda3a2",
+    "token_sources": [
+      "api_usage"
+    ],
+    "synthetic_data": true
+  },
+  "variant_definitions": {
+    "full_context": "All declared record fields.",
+    "masking_only": "Full record with the selected masking layer applied.",
+    "minimum_context": "Only the allowlisted fields: issue_description, product_area, urgency.",
+    "minimum_plus_masking": "Minimum context with the selected masking layer applied to remaining text."
+  },
+  "metrics": {
+    "full_context": {
+      "correct": 15,
+      "total": 16,
+      "accuracy": 0.9375,
+      "decision_changes_vs_full": 0,
+      "decision_stability_vs_full": 1.0,
+      "input_tokens": 2383,
+      "token_reduction_vs_full": 0.0,
+      "field_instances_sent": 144,
+      "field_reduction_vs_full": 0.0,
+      "raw_structured_pii_values_sent": 96,
+      "raw_structured_pii_reduction_vs_full": 0.0,
+      "accepted_without_review": true
+    },
+    "masking_only": {
+      "correct": 15,
+      "total": 16,
+      "accuracy": 0.9375,
+      "decision_changes_vs_full": 0,
+      "decision_stability_vs_full": 1.0,
+      "input_tokens": 2272,
+      "token_reduction_vs_full": 0.04658,
+      "field_instances_sent": 144,
+      "field_reduction_vs_full": 0.0,
+      "raw_structured_pii_values_sent": 0,
+      "raw_structured_pii_reduction_vs_full": 1.0,
+      "accepted_without_review": true
+    },
+    "minimum_context": {
+      "correct": 15,
+      "total": 16,
+      "accuracy": 0.9375,
+      "decision_changes_vs_full": 0,
+      "decision_stability_vs_full": 1.0,
+      "input_tokens": 1312,
+      "token_reduction_vs_full": 0.449433,
+      "field_instances_sent": 48,
+      "field_reduction_vs_full": 0.666667,
+      "raw_structured_pii_values_sent": 0,
+      "raw_structured_pii_reduction_vs_full": 1.0,
+      "accepted_without_review": true
+    },
+    "minimum_plus_masking": {
+      "correct": 15,
+      "total": 16,
+      "accuracy": 0.9375,
+      "decision_changes_vs_full": 0,
+      "decision_stability_vs_full": 1.0,
+      "input_tokens": 1312,
+      "token_reduction_vs_full": 0.449433,
+      "field_instances_sent": 48,
+      "field_reduction_vs_full": 0.666667,
+      "raw_structured_pii_values_sent": 0,
+      "raw_structured_pii_reduction_vs_full": 1.0,
+      "accepted_without_review": true
+    }
+  },
+  "observations": {
+    "full_context": [
+      {
+        "ticket_id": "T001",
+        "prediction": "billing",
+        "expected": "billing",
+        "input_tokens": 150,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Please help me, this is urgent.",
+          "product_area": "Billing",
+          "urgency": "high",
+          "name": "Alice Martin",
+          "email": "alice.martin@example.com",
+          "phone": "+33 6 12 34 56 78",
+          "date_of_birth": "1988-04-12",
+          "address": "12 Rue de Rivoli, 75001 Paris, France",
+          "account_id": "ACC-10234"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Please help me, this is urgent.\n- product_area: Billing\n- urgency: high\n- name: Alice Martin\n- email: alice.martin@example.com\n- phone: +33 6 12 34 56 78\n- date_of_birth: 1988-04-12\n- address: 12 Rue de Rivoli, 75001 Paris, France\n- account_id: ACC-10234"
+      },
+      {
+        "ticket_id": "T002",
+        "prediction": "billing",
+        "expected": "billing",
+        "input_tokens": 145,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I was charged twice for the same invoice this month.",
+          "product_area": "Support",
+          "urgency": "medium",
+          "name": "Bruno Costa",
+          "email": "bruno.costa@example.com",
+          "phone": "+351 91 234 5678",
+          "date_of_birth": "1979-11-02",
+          "address": "Rua Augusta 100, Lisboa, Portugal",
+          "account_id": "ACC-88213"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I was charged twice for the same invoice this month.\n- product_area: Support\n- urgency: medium\n- name: Bruno Costa\n- email: bruno.costa@example.com\n- phone: +351 91 234 5678\n- date_of_birth: 1979-11-02\n- address: Rua Augusta 100, Lisboa, Portugal\n- account_id: ACC-88213"
+      },
+      {
+        "ticket_id": "T003",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 152,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Something is wrong, can someone look at this?",
+          "product_area": "Account Access",
+          "urgency": "high",
+          "name": "Chidi Okafor",
+          "email": "chidi.okafor@example.com",
+          "phone": "+234 803 555 1122",
+          "date_of_birth": "1995-01-30",
+          "address": "14 Adeola Odeku St, Lagos, Nigeria",
+          "account_id": "ACC-55901"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Something is wrong, can someone look at this?\n- product_area: Account Access\n- urgency: high\n- name: Chidi Okafor\n- email: chidi.okafor@example.com\n- phone: +234 803 555 1122\n- date_of_birth: 1995-01-30\n- address: 14 Adeola Odeku St, Lagos, Nigeria\n- account_id: ACC-55901"
+      },
+      {
+        "ticket_id": "T004",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 150,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I'm locked out of my account after entering the wrong password too many times.",
+          "product_area": "Support",
+          "urgency": "high",
+          "name": "Dana White",
+          "email": "dana.white@example.com",
+          "phone": "+1 415 555 0134",
+          "date_of_birth": "1990-07-19",
+          "address": "500 Market St, San Francisco, CA, USA",
+          "account_id": "ACC-30044"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I'm locked out of my account after entering the wrong password too many times.\n- product_area: Support\n- urgency: high\n- name: Dana White\n- email: dana.white@example.com\n- phone: +1 415 555 0134\n- date_of_birth: 1990-07-19\n- address: 500 Market St, San Francisco, CA, USA\n- account_id: ACC-30044"
+      },
+      {
+        "ticket_id": "T005",
+        "prediction": "general_inquiry",
+        "expected": "shipping_logistics",
+        "input_tokens": 148,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Not sure what to do, need assistance please.",
+          "product_area": "Shipping",
+          "urgency": "low",
+          "name": "Elin Svensson",
+          "email": "elin.svensson@example.com",
+          "phone": "+46 70 123 4567",
+          "date_of_birth": "1983-09-05",
+          "address": "Sveavagen 10, Stockholm, Sweden",
+          "account_id": "ACC-77120"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Not sure what to do, need assistance please.\n- product_area: Shipping\n- urgency: low\n- name: Elin Svensson\n- email: elin.svensson@example.com\n- phone: +46 70 123 4567\n- date_of_birth: 1983-09-05\n- address: Sveavagen 10, Stockholm, Sweden\n- account_id: ACC-77120"
+      },
+      {
+        "ticket_id": "T006",
+        "prediction": "shipping_logistics",
+        "expected": "shipping_logistics",
+        "input_tokens": 149,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "My package tracking shows no movement for a week.",
+          "product_area": "Support",
+          "urgency": "medium",
+          "name": "Farid Haidari",
+          "email": "farid.haidari@example.com",
+          "phone": "+49 152 3344 5566",
+          "date_of_birth": "1992-03-21",
+          "address": "Alexanderplatz 5, Berlin, Germany",
+          "account_id": "ACC-40218"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: My package tracking shows no movement for a week.\n- product_area: Support\n- urgency: medium\n- name: Farid Haidari\n- email: farid.haidari@example.com\n- phone: +49 152 3344 5566\n- date_of_birth: 1992-03-21\n- address: Alexanderplatz 5, Berlin, Germany\n- account_id: ACC-40218"
+      },
+      {
+        "ticket_id": "T007",
+        "prediction": "technical_support",
+        "expected": "technical_support",
+        "input_tokens": 150,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Can you check my case? I need this resolved quickly.",
+          "product_area": "Bug Report",
+          "urgency": "high",
+          "name": "Grace Kim",
+          "email": "grace.kim@example.com",
+          "phone": "+82 10 2345 6789",
+          "date_of_birth": "1997-06-14",
+          "address": "45 Teheran-ro, Seoul, South Korea",
+          "account_id": "ACC-91003"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Can you check my case? I need this resolved quickly.\n- product_area: Bug Report\n- urgency: high\n- name: Grace Kim\n- email: grace.kim@example.com\n- phone: +82 10 2345 6789\n- date_of_birth: 1997-06-14\n- address: 45 Teheran-ro, Seoul, South Korea\n- account_id: ACC-91003"
+      },
+      {
+        "ticket_id": "T008",
+        "prediction": "technical_support",
+        "expected": "technical_support",
+        "input_tokens": 157,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "The app keeps crashing every time I try to sync my data.",
+          "product_area": "Support",
+          "urgency": "medium",
+          "name": "Hugo Bernard",
+          "email": "hugo.bernard@example.com",
+          "phone": "+33 6 98 76 54 32",
+          "date_of_birth": "1985-12-01",
+          "address": "8 Cours Mirabeau, Aix-en-Provence, France",
+          "account_id": "ACC-60377"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: The app keeps crashing every time I try to sync my data.\n- product_area: Support\n- urgency: medium\n- name: Hugo Bernard\n- email: hugo.bernard@example.com\n- phone: +33 6 98 76 54 32\n- date_of_birth: 1985-12-01\n- address: 8 Cours Mirabeau, Aix-en-Provence, France\n- account_id: ACC-60377"
+      },
+      {
+        "ticket_id": "T009",
+        "prediction": "general_inquiry",
+        "expected": "general_inquiry",
+        "input_tokens": 148,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I have a question, hope someone can help.",
+          "product_area": "General",
+          "urgency": "low",
+          "name": "Ines Petrova",
+          "email": "ines.petrova@example.com",
+          "phone": "+359 88 123 4567",
+          "date_of_birth": "1991-02-27",
+          "address": "Vitosha Blvd 20, Sofia, Bulgaria",
+          "account_id": "ACC-20456"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I have a question, hope someone can help.\n- product_area: General\n- urgency: low\n- name: Ines Petrova\n- email: ines.petrova@example.com\n- phone: +359 88 123 4567\n- date_of_birth: 1991-02-27\n- address: Vitosha Blvd 20, Sofia, Bulgaria\n- account_id: ACC-20456"
+      },
+      {
+        "ticket_id": "T010",
+        "prediction": "general_inquiry",
+        "expected": "general_inquiry",
+        "input_tokens": 149,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "What are your opening hours for customer support?",
+          "product_area": "Support",
+          "urgency": "low",
+          "name": "Jonas Lehtinen",
+          "email": "jonas.lehtinen@example.com",
+          "phone": "+358 40 123 4567",
+          "date_of_birth": "1980-10-08",
+          "address": "Mannerheimintie 3, Helsinki, Finland",
+          "account_id": "ACC-33809"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: What are your opening hours for customer support?\n- product_area: Support\n- urgency: low\n- name: Jonas Lehtinen\n- email: jonas.lehtinen@example.com\n- phone: +358 40 123 4567\n- date_of_birth: 1980-10-08\n- address: Mannerheimintie 3, Helsinki, Finland\n- account_id: ACC-33809"
+      },
+      {
+        "ticket_id": "T011",
+        "prediction": "billing",
+        "expected": "billing",
+        "input_tokens": 153,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I need a refund for a duplicate charge on my last statement.",
+          "product_area": "Support",
+          "urgency": "medium",
+          "name": "Karim Belhadj",
+          "email": "karim.belhadj@example.com",
+          "phone": "+212 6 61 22 33 44",
+          "date_of_birth": "1987-05-17",
+          "address": "Avenue Hassan II, Casablanca, Morocco",
+          "account_id": "ACC-71255"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I need a refund for a duplicate charge on my last statement.\n- product_area: Support\n- urgency: medium\n- name: Karim Belhadj\n- email: karim.belhadj@example.com\n- phone: +212 6 61 22 33 44\n- date_of_birth: 1987-05-17\n- address: Avenue Hassan II, Casablanca, Morocco\n- account_id: ACC-71255"
+      },
+      {
+        "ticket_id": "T012",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 148,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Please advise on this matter as soon as possible.",
+          "product_area": "Account Access",
+          "urgency": "high",
+          "name": "Lena Fischer",
+          "email": "lena.fischer@example.com",
+          "phone": "+43 660 123 4567",
+          "date_of_birth": "1994-08-23",
+          "address": "Mariahilfer Strasse 12, Vienna, Austria",
+          "account_id": "ACC-48890"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Please advise on this matter as soon as possible.\n- product_area: Account Access\n- urgency: high\n- name: Lena Fischer\n- email: lena.fischer@example.com\n- phone: +43 660 123 4567\n- date_of_birth: 1994-08-23\n- address: Mariahilfer Strasse 12, Vienna, Austria\n- account_id: ACC-48890"
+      },
+      {
+        "ticket_id": "T013",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 149,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "My two-factor authentication code never arrives by SMS.",
+          "product_area": "Support",
+          "urgency": "high",
+          "name": "Mateus Silva",
+          "email": "mateus.silva@example.com",
+          "phone": "+55 11 98765 4321",
+          "date_of_birth": "1989-01-11",
+          "address": "Av. Paulista 900, Sao Paulo, Brazil",
+          "account_id": "ACC-15577"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: My two-factor authentication code never arrives by SMS.\n- product_area: Support\n- urgency: high\n- name: Mateus Silva\n- email: mateus.silva@example.com\n- phone: +55 11 98765 4321\n- date_of_birth: 1989-01-11\n- address: Av. Paulista 900, Sao Paulo, Brazil\n- account_id: ACC-15577"
+      },
+      {
+        "ticket_id": "T014",
+        "prediction": "shipping_logistics",
+        "expected": "shipping_logistics",
+        "input_tokens": 147,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "The courier marked my delivery as complete but I never received it.",
+          "product_area": "Support",
+          "urgency": "medium",
+          "name": "Nora Haddad",
+          "email": "nora.haddad@example.com",
+          "phone": "+961 71 234 567",
+          "date_of_birth": "1993-04-04",
+          "address": "Hamra Street, Beirut, Lebanon",
+          "account_id": "ACC-52690"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: The courier marked my delivery as complete but I never received it.\n- product_area: Support\n- urgency: medium\n- name: Nora Haddad\n- email: nora.haddad@example.com\n- phone: +961 71 234 567\n- date_of_birth: 1993-04-04\n- address: Hamra Street, Beirut, Lebanon\n- account_id: ACC-52690"
+      },
+      {
+        "ticket_id": "T015",
+        "prediction": "technical_support",
+        "expected": "technical_support",
+        "input_tokens": 145,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "This needs a response today, please.",
+          "product_area": "Bug Report",
+          "urgency": "high",
+          "name": "Omar Saeed",
+          "email": "omar.saeed@example.com",
+          "phone": "+20 100 123 4567",
+          "date_of_birth": "1996-09-09",
+          "address": "Tahrir Square, Cairo, Egypt",
+          "account_id": "ACC-64412"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: This needs a response today, please.\n- product_area: Bug Report\n- urgency: high\n- name: Omar Saeed\n- email: omar.saeed@example.com\n- phone: +20 100 123 4567\n- date_of_birth: 1996-09-09\n- address: Tahrir Square, Cairo, Egypt\n- account_id: ACC-64412"
+      },
+      {
+        "ticket_id": "T016",
+        "prediction": "general_inquiry",
+        "expected": "general_inquiry",
+        "input_tokens": 143,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I'd like to know more about your product roadmap.",
+          "product_area": "General",
+          "urgency": "low",
+          "name": "Priya Nair",
+          "email": "priya.nair@example.com",
+          "phone": "+91 98765 43210",
+          "date_of_birth": "1986-06-30",
+          "address": "MG Road, Bengaluru, India",
+          "account_id": "ACC-27738"
+        },
+        "raw_structured_pii_values_sent": 6,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I'd like to know more about your product roadmap.\n- product_area: General\n- urgency: low\n- name: Priya Nair\n- email: priya.nair@example.com\n- phone: +91 98765 43210\n- date_of_birth: 1986-06-30\n- address: MG Road, Bengaluru, India\n- account_id: ACC-27738"
+      }
+    ],
+    "masking_only": [
+      {
+        "ticket_id": "T001",
+        "prediction": "billing",
+        "expected": "billing",
+        "input_tokens": 139,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Please help me, this is urgent.",
+          "product_area": "Billing",
+          "urgency": "high",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Please help me, this is urgent.\n- product_area: Billing\n- urgency: high\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T002",
+        "prediction": "billing",
+        "expected": "billing",
+        "input_tokens": 142,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I was charged twice for the same invoice this month.",
+          "product_area": "Support",
+          "urgency": "medium",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I was charged twice for the same invoice this month.\n- product_area: Support\n- urgency: medium\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T003",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 142,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Something is wrong, can someone look at this?",
+          "product_area": "Account Access",
+          "urgency": "high",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Something is wrong, can someone look at this?\n- product_area: Account Access\n- urgency: high\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T004",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 146,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I'm locked out of my account after entering the wrong password too many times.",
+          "product_area": "Support",
+          "urgency": "high",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I'm locked out of my account after entering the wrong password too many times.\n- product_area: Support\n- urgency: high\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T005",
+        "prediction": "general_inquiry",
+        "expected": "shipping_logistics",
+        "input_tokens": 141,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Not sure what to do, need assistance please.",
+          "product_area": "Shipping",
+          "urgency": "low",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Not sure what to do, need assistance please.\n- product_area: Shipping\n- urgency: low\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T006",
+        "prediction": "shipping_logistics",
+        "expected": "shipping_logistics",
+        "input_tokens": 141,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "My package tracking shows no movement for a week.",
+          "product_area": "Support",
+          "urgency": "medium",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: My package tracking shows no movement for a week.\n- product_area: Support\n- urgency: medium\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T007",
+        "prediction": "technical_support",
+        "expected": "technical_support",
+        "input_tokens": 144,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Can you check my case? I need this resolved quickly.",
+          "product_area": "Bug Report",
+          "urgency": "high",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Can you check my case? I need this resolved quickly.\n- product_area: Bug Report\n- urgency: high\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T008",
+        "prediction": "technical_support",
+        "expected": "technical_support",
+        "input_tokens": 144,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "The app keeps crashing every time I try to sync my data.",
+          "product_area": "Support",
+          "urgency": "medium",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: The app keeps crashing every time I try to sync my data.\n- product_area: Support\n- urgency: medium\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T009",
+        "prediction": "general_inquiry",
+        "expected": "general_inquiry",
+        "input_tokens": 141,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I have a question, hope someone can help.",
+          "product_area": "General",
+          "urgency": "low",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I have a question, hope someone can help.\n- product_area: General\n- urgency: low\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T010",
+        "prediction": "general_inquiry",
+        "expected": "general_inquiry",
+        "input_tokens": 140,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "What are your opening hours for customer support?",
+          "product_area": "Support",
+          "urgency": "low",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: What are your opening hours for customer support?\n- product_area: Support\n- urgency: low\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T011",
+        "prediction": "billing",
+        "expected": "billing",
+        "input_tokens": 144,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I need a refund for a duplicate charge on my last statement.",
+          "product_area": "Support",
+          "urgency": "medium",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I need a refund for a duplicate charge on my last statement.\n- product_area: Support\n- urgency: medium\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T012",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 142,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Please advise on this matter as soon as possible.",
+          "product_area": "Account Access",
+          "urgency": "high",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Please advise on this matter as soon as possible.\n- product_area: Account Access\n- urgency: high\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T013",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 141,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "My two-factor authentication code never arrives by SMS.",
+          "product_area": "Support",
+          "urgency": "high",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: My two-factor authentication code never arrives by SMS.\n- product_area: Support\n- urgency: high\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T014",
+        "prediction": "shipping_logistics",
+        "expected": "shipping_logistics",
+        "input_tokens": 144,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "The courier marked my delivery as complete but I never received it.",
+          "product_area": "Support",
+          "urgency": "medium",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: The courier marked my delivery as complete but I never received it.\n- product_area: Support\n- urgency: medium\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T015",
+        "prediction": "technical_support",
+        "expected": "technical_support",
+        "input_tokens": 140,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "This needs a response today, please.",
+          "product_area": "Bug Report",
+          "urgency": "high",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: This needs a response today, please.\n- product_area: Bug Report\n- urgency: high\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      },
+      {
+        "ticket_id": "T016",
+        "prediction": "general_inquiry",
+        "expected": "general_inquiry",
+        "input_tokens": 141,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I'd like to know more about your product roadmap.",
+          "product_area": "General",
+          "urgency": "low",
+          "name": "[MASKED:name]",
+          "email": "[MASKED:email]",
+          "phone": "[MASKED:phone]",
+          "date_of_birth": "[MASKED:date_of_birth]",
+          "address": "[MASKED:address]",
+          "account_id": "[MASKED:account_id]"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I'd like to know more about your product roadmap.\n- product_area: General\n- urgency: low\n- name: [MASKED:name]\n- email: [MASKED:email]\n- phone: [MASKED:phone]\n- date_of_birth: [MASKED:date_of_birth]\n- address: [MASKED:address]\n- account_id: [MASKED:account_id]"
+      }
+    ],
+    "minimum_context": [
+      {
+        "ticket_id": "T001",
+        "prediction": "billing",
+        "expected": "billing",
+        "input_tokens": 79,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Please help me, this is urgent.",
+          "product_area": "Billing",
+          "urgency": "high"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Please help me, this is urgent.\n- product_area: Billing\n- urgency: high"
+      },
+      {
+        "ticket_id": "T002",
+        "prediction": "billing",
+        "expected": "billing",
+        "input_tokens": 82,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I was charged twice for the same invoice this month.",
+          "product_area": "Support",
+          "urgency": "medium"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I was charged twice for the same invoice this month.\n- product_area: Support\n- urgency: medium"
+      },
+      {
+        "ticket_id": "T003",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 82,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Something is wrong, can someone look at this?",
+          "product_area": "Account Access",
+          "urgency": "high"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Something is wrong, can someone look at this?\n- product_area: Account Access\n- urgency: high"
+      },
+      {
+        "ticket_id": "T004",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 86,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I'm locked out of my account after entering the wrong password too many times.",
+          "product_area": "Support",
+          "urgency": "high"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I'm locked out of my account after entering the wrong password too many times.\n- product_area: Support\n- urgency: high"
+      },
+      {
+        "ticket_id": "T005",
+        "prediction": "general_inquiry",
+        "expected": "shipping_logistics",
+        "input_tokens": 81,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Not sure what to do, need assistance please.",
+          "product_area": "Shipping",
+          "urgency": "low"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Not sure what to do, need assistance please.\n- product_area: Shipping\n- urgency: low"
+      },
+      {
+        "ticket_id": "T006",
+        "prediction": "shipping_logistics",
+        "expected": "shipping_logistics",
+        "input_tokens": 81,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "My package tracking shows no movement for a week.",
+          "product_area": "Support",
+          "urgency": "medium"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: My package tracking shows no movement for a week.\n- product_area: Support\n- urgency: medium"
+      },
+      {
+        "ticket_id": "T007",
+        "prediction": "technical_support",
+        "expected": "technical_support",
+        "input_tokens": 84,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Can you check my case? I need this resolved quickly.",
+          "product_area": "Bug Report",
+          "urgency": "high"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Can you check my case? I need this resolved quickly.\n- product_area: Bug Report\n- urgency: high"
+      },
+      {
+        "ticket_id": "T008",
+        "prediction": "technical_support",
+        "expected": "technical_support",
+        "input_tokens": 84,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "The app keeps crashing every time I try to sync my data.",
+          "product_area": "Support",
+          "urgency": "medium"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: The app keeps crashing every time I try to sync my data.\n- product_area: Support\n- urgency: medium"
+      },
+      {
+        "ticket_id": "T009",
+        "prediction": "general_inquiry",
+        "expected": "general_inquiry",
+        "input_tokens": 81,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I have a question, hope someone can help.",
+          "product_area": "General",
+          "urgency": "low"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I have a question, hope someone can help.\n- product_area: General\n- urgency: low"
+      },
+      {
+        "ticket_id": "T010",
+        "prediction": "general_inquiry",
+        "expected": "general_inquiry",
+        "input_tokens": 80,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "What are your opening hours for customer support?",
+          "product_area": "Support",
+          "urgency": "low"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: What are your opening hours for customer support?\n- product_area: Support\n- urgency: low"
+      },
+      {
+        "ticket_id": "T011",
+        "prediction": "billing",
+        "expected": "billing",
+        "input_tokens": 84,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I need a refund for a duplicate charge on my last statement.",
+          "product_area": "Support",
+          "urgency": "medium"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I need a refund for a duplicate charge on my last statement.\n- product_area: Support\n- urgency: medium"
+      },
+      {
+        "ticket_id": "T012",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 82,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Please advise on this matter as soon as possible.",
+          "product_area": "Account Access",
+          "urgency": "high"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Please advise on this matter as soon as possible.\n- product_area: Account Access\n- urgency: high"
+      },
+      {
+        "ticket_id": "T013",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 81,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "My two-factor authentication code never arrives by SMS.",
+          "product_area": "Support",
+          "urgency": "high"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: My two-factor authentication code never arrives by SMS.\n- product_area: Support\n- urgency: high"
+      },
+      {
+        "ticket_id": "T014",
+        "prediction": "shipping_logistics",
+        "expected": "shipping_logistics",
+        "input_tokens": 84,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "The courier marked my delivery as complete but I never received it.",
+          "product_area": "Support",
+          "urgency": "medium"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: The courier marked my delivery as complete but I never received it.\n- product_area: Support\n- urgency: medium"
+      },
+      {
+        "ticket_id": "T015",
+        "prediction": "technical_support",
+        "expected": "technical_support",
+        "input_tokens": 80,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "This needs a response today, please.",
+          "product_area": "Bug Report",
+          "urgency": "high"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: This needs a response today, please.\n- product_area: Bug Report\n- urgency: high"
+      },
+      {
+        "ticket_id": "T016",
+        "prediction": "general_inquiry",
+        "expected": "general_inquiry",
+        "input_tokens": 81,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I'd like to know more about your product roadmap.",
+          "product_area": "General",
+          "urgency": "low"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I'd like to know more about your product roadmap.\n- product_area: General\n- urgency: low"
+      }
+    ],
+    "minimum_plus_masking": [
+      {
+        "ticket_id": "T001",
+        "prediction": "billing",
+        "expected": "billing",
+        "input_tokens": 79,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Please help me, this is urgent.",
+          "product_area": "Billing",
+          "urgency": "high"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Please help me, this is urgent.\n- product_area: Billing\n- urgency: high"
+      },
+      {
+        "ticket_id": "T002",
+        "prediction": "billing",
+        "expected": "billing",
+        "input_tokens": 82,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I was charged twice for the same invoice this month.",
+          "product_area": "Support",
+          "urgency": "medium"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I was charged twice for the same invoice this month.\n- product_area: Support\n- urgency: medium"
+      },
+      {
+        "ticket_id": "T003",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 82,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Something is wrong, can someone look at this?",
+          "product_area": "Account Access",
+          "urgency": "high"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Something is wrong, can someone look at this?\n- product_area: Account Access\n- urgency: high"
+      },
+      {
+        "ticket_id": "T004",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 86,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I'm locked out of my account after entering the wrong password too many times.",
+          "product_area": "Support",
+          "urgency": "high"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I'm locked out of my account after entering the wrong password too many times.\n- product_area: Support\n- urgency: high"
+      },
+      {
+        "ticket_id": "T005",
+        "prediction": "general_inquiry",
+        "expected": "shipping_logistics",
+        "input_tokens": 81,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Not sure what to do, need assistance please.",
+          "product_area": "Shipping",
+          "urgency": "low"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Not sure what to do, need assistance please.\n- product_area: Shipping\n- urgency: low"
+      },
+      {
+        "ticket_id": "T006",
+        "prediction": "shipping_logistics",
+        "expected": "shipping_logistics",
+        "input_tokens": 81,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "My package tracking shows no movement for a week.",
+          "product_area": "Support",
+          "urgency": "medium"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: My package tracking shows no movement for a week.\n- product_area: Support\n- urgency: medium"
+      },
+      {
+        "ticket_id": "T007",
+        "prediction": "technical_support",
+        "expected": "technical_support",
+        "input_tokens": 84,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Can you check my case? I need this resolved quickly.",
+          "product_area": "Bug Report",
+          "urgency": "high"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Can you check my case? I need this resolved quickly.\n- product_area: Bug Report\n- urgency: high"
+      },
+      {
+        "ticket_id": "T008",
+        "prediction": "technical_support",
+        "expected": "technical_support",
+        "input_tokens": 84,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "The app keeps crashing every time I try to sync my data.",
+          "product_area": "Support",
+          "urgency": "medium"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: The app keeps crashing every time I try to sync my data.\n- product_area: Support\n- urgency: medium"
+      },
+      {
+        "ticket_id": "T009",
+        "prediction": "general_inquiry",
+        "expected": "general_inquiry",
+        "input_tokens": 81,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I have a question, hope someone can help.",
+          "product_area": "General",
+          "urgency": "low"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I have a question, hope someone can help.\n- product_area: General\n- urgency: low"
+      },
+      {
+        "ticket_id": "T010",
+        "prediction": "general_inquiry",
+        "expected": "general_inquiry",
+        "input_tokens": 80,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "What are your opening hours for customer support?",
+          "product_area": "Support",
+          "urgency": "low"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: What are your opening hours for customer support?\n- product_area: Support\n- urgency: low"
+      },
+      {
+        "ticket_id": "T011",
+        "prediction": "billing",
+        "expected": "billing",
+        "input_tokens": 84,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I need a refund for a duplicate charge on my last statement.",
+          "product_area": "Support",
+          "urgency": "medium"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I need a refund for a duplicate charge on my last statement.\n- product_area: Support\n- urgency: medium"
+      },
+      {
+        "ticket_id": "T012",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 82,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "Please advise on this matter as soon as possible.",
+          "product_area": "Account Access",
+          "urgency": "high"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: Please advise on this matter as soon as possible.\n- product_area: Account Access\n- urgency: high"
+      },
+      {
+        "ticket_id": "T013",
+        "prediction": "account_security",
+        "expected": "account_security",
+        "input_tokens": 81,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "My two-factor authentication code never arrives by SMS.",
+          "product_area": "Support",
+          "urgency": "high"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: My two-factor authentication code never arrives by SMS.\n- product_area: Support\n- urgency: high"
+      },
+      {
+        "ticket_id": "T014",
+        "prediction": "shipping_logistics",
+        "expected": "shipping_logistics",
+        "input_tokens": 84,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "The courier marked my delivery as complete but I never received it.",
+          "product_area": "Support",
+          "urgency": "medium"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: The courier marked my delivery as complete but I never received it.\n- product_area: Support\n- urgency: medium"
+      },
+      {
+        "ticket_id": "T015",
+        "prediction": "technical_support",
+        "expected": "technical_support",
+        "input_tokens": 80,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "This needs a response today, please.",
+          "product_area": "Bug Report",
+          "urgency": "high"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: This needs a response today, please.\n- product_area: Bug Report\n- urgency: high"
+      },
+      {
+        "ticket_id": "T016",
+        "prediction": "general_inquiry",
+        "expected": "general_inquiry",
+        "input_tokens": 81,
+        "token_source": "api_usage",
+        "payload": {
+          "issue_description": "I'd like to know more about your product roadmap.",
+          "product_area": "General",
+          "urgency": "low"
+        },
+        "raw_structured_pii_values_sent": 0,
+        "prompt": "You are a support ticket router. Given the fields below, reply with exactly one queue name from this list: billing, account_security, shipping_logistics, technical_support, general_inquiry. Reply with the queue name only, nothing else.\n\nFields:\n- issue_description: I'd like to know more about your product roadmap.\n- product_area: General\n- urgency: low"
+      }
+    ]
+  },
+  "limitations": [
+    "The corpus is small, synthetic, and specific to support-ticket routing.",
+    "Results are bounded to this corpus, prompt, model configuration, and run.",
+    "No result is a legal conclusion or a universal proof that a field never matters.",
+    "The masking condition uses declared structured fields and is not an OpenAI Privacy Filter evaluation."
+  ]
+}
