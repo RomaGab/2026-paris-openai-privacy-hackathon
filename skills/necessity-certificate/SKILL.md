@@ -115,9 +115,11 @@ The same pipeline is also deployed as a Cloudflare Workers MCP server at
   — the full pipeline above, returning the markdown certificate, the minimized SQL, and the JSON report.
 
 Add it to any MCP client (Claude Desktop, VS Code, the AI Playground, `mcp-remote`) by pointing at that URL; no
-authentication is configured (demo deployment). Set the `OPENAI_API_KEY` secret on the Worker
-(`wrangler secret put OPENAI_API_KEY` from `mcp/`) to get real evidence instead of the offline dry run; the demo
-deployment caps input at 25 records per call.
+authentication is configured (demo deployment). Works out of the box with no key: without `OPENAI_API_KEY`, the
+Worker runs a real offline Naive Bayes classifier trained on the records you send it (a document-frequency filter
+drops record-unique tokens like emails/IDs so it can't just memorize labels), so field ablation still shows
+genuine signal, not a placeholder. Set the `OPENAI_API_KEY` secret (`wrangler secret put OPENAI_API_KEY` from
+`mcp/`) for LLM-backed evidence instead; the demo deployment caps input at 25 records per call.
 
 ### Try it on the existing demo data
 

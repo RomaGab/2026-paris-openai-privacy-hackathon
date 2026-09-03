@@ -169,6 +169,120 @@ function majorityLabel(records: Record_[], labelField: string): string | undefin
   return best;
 }
 
+function tokenize(text: string): string[] {
+  const raw = text.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+  // Purely numeric tokens (phone digits, dates, account numbers) are almost
+  // never generalizable topic signal for a classification task -- keeping
+  // them in the vocabulary mostly just adds identifier noise.
+  return raw.filter((w) => !/^[0-9]+$/.test(w));
+}
+
+// A real (if lightweight) multinomial Naive Bayes text classifier, trained
+// directly on the declared records for the given pass (i.e. with the same
+// field dropped from both training and prediction). Used only when no LLM
+// API key is configured, so the offline demo path still shows genuine
+// field sensitivity instead of a placeholder that never changes.
+interface BowModel {
+  classes: string[];
+  docCountByClass: Record<string, number>;
+  wordCountByClass: Record<string, Record<string, number>>;
+  totalWordsByClass: Record<string, number>;
+  vocabSize: number;
+  totalDocs: number;
+}
+
+function trainBow(
+  records: Record_[],
+  inputFields: string[],
+  labelField: string,
+  dropField: string | undefined,
+  labelValuesHint: string[] | undefined
+): BowModel {
+  const classes = new Set<string>(labelValuesHint ?? []);
+  const docCountByClass: Record<string, number> = {};
+  const wordCountByClass: Record<string, Record<string, number>> = {};
+  const totalWordsByClass: Record<string, number> = {};
+  let totalDocs = 0;
+
+  // First pass: per-record token sets, to compute document frequency.
+  const perRecordTokens: { cls: string; tokens: string[] }[] = [];
+  const docFreq = new Map<string, number>();
+  for (const record of records) {
+    const label = record[labelField];
+    if (label === undefined || label === null) continue;
+    const cls = String(label);
+    const p = payload(record, inputFields, dropField);
+    const text = Object.values(p)
+      .filter((v) => v !== null && v !== undefined)
+      .map(String)
+      .join(" ");
+    const tokens = tokenize(text);
+    perRecordTokens.push({ cls, tokens });
+    for (const word of new Set(tokens)) docFreq.set(word, (docFreq.get(word) ?? 0) + 1);
+  }
+
+  // A word that appears in only one record can never generalize -- it just
+  // lets the model memorize that one record's own (often unique) identifier
+  // instead of learning a real pattern. Drop it from the vocabulary so
+  // per-field ablation reflects genuine, recurring signal, not memorization.
+  const vocab = new Set<string>();
+  for (const { cls, tokens } of perRecordTokens) {
+    classes.add(cls);
+    docCountByClass[cls] = (docCountByClass[cls] ?? 0) + 1;
+    totalDocs++;
+    wordCountByClass[cls] ??= {};
+    for (const word of tokens) {
+      if ((docFreq.get(word) ?? 0) < 2) continue;
+      vocab.add(word);
+      wordCountByClass[cls][word] = (wordCountByClass[cls][word] ?? 0) + 1;
+      totalWordsByClass[cls] = (totalWordsByClass[cls] ?? 0) + 1;
+    }
+  }
+
+  return {
+    classes: [...classes],
+    docCountByClass,
+    wordCountByClass,
+    totalWordsByClass,
+    vocabSize: vocab.size || 1,
+    totalDocs,
+  };
+}
+
+function predictBow(
+  model: BowModel,
+  record: Record_,
+  inputFields: string[],
+  dropField: string | undefined,
+  fallback: string | undefined
+): string {
+  if (model.classes.length === 0) return fallback ?? "";
+  const p = payload(record, inputFields, dropField);
+  const text = Object.values(p)
+    .filter((v) => v !== null && v !== undefined)
+    .map(String)
+    .join(" ");
+  const tokens = tokenize(text);
+
+  let bestClass = fallback ?? model.classes[0];
+  let bestScore = -Infinity;
+  for (const cls of model.classes) {
+    const prior = (model.docCountByClass[cls] ?? 0) + 1;
+    let score = Math.log(prior / (model.totalDocs + model.classes.length));
+    const wordCounts = model.wordCountByClass[cls] ?? {};
+    const totalWords = model.totalWordsByClass[cls] ?? 0;
+    for (const word of tokens) {
+      const wc = wordCounts[word] ?? 0;
+      score += Math.log((wc + 1) / (totalWords + model.vocabSize));
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      bestClass = cls;
+    }
+  }
+  return bestClass;
+}
+
 async function mapWithConcurrency<T, R>(
   items: T[],
   limit: number,
@@ -199,13 +313,18 @@ async function runPass(
   dropField?: string
 ): Promise<{ predictions: string[]; tokensSent: number }> {
   let tokensSent = 0;
-  const predictions = await mapWithConcurrency(records, 4, async (record) => {
+  // Trained once per pass (baseline, or with one field dropped), so the
+  // offline model never sees the ablated field in training either. Words
+  // that appear in only one record are excluded from the vocabulary (see
+  // trainBow), so this can't just memorize a record's own identifiers.
+  const bowModel = useOpenAI ? undefined : trainBow(records, inputFields, labelField, dropField, labelValues);
+  const predictions = await mapWithConcurrency(records, 4, async (record, i) => {
     const p = payload(record, inputFields, dropField);
     tokensSent += approxTokenCount(JSON.stringify(p));
     if (useOpenAI && apiKey) {
       return callOpenAI(apiKey, model, purpose, labelField, labelValues, p);
     }
-    return fallbackMajority ?? "";
+    return predictBow(bowModel!, record, inputFields, dropField, fallbackMajority);
   });
   return { predictions, tokensSent };
 }
@@ -334,7 +453,7 @@ export async function buildReport(opts: {
   return {
     purpose,
     table_name: tableName,
-    engine: useOpenAI ? `openai:${model}` : "offline_majority_class_baseline (dry run only)",
+    engine: useOpenAI ? `openai:${model}` : "offline_bag_of_words_baseline (no LLM; a Naive Bayes model trained on the provided records, for a no-key demo -- use a real model for production evidence)",
     test_set_size: n,
     baseline_accuracy: baselineAccuracy,
     baseline_tokens_total: baseline.tokensSent,

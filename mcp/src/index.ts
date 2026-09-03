@@ -70,8 +70,9 @@ function createServer(env: Env) {
         "AI-facing SQL view (only proven-necessary, safe-to-expose columns), and a secure base-table DDL " +
         "(columns kept only for a secondary declared purpose are stored encrypted/generalized, never plain). " +
         "Fail-closed: any column not proven necessary is blocked by default. " +
-        "Set the OPENAI_API_KEY secret on this Worker to get real evidence; without it, this falls back to an " +
-        "offline majority-class dry run that only exercises the pipeline, not genuine evidence.",
+        "Set the OPENAI_API_KEY secret on this Worker for LLM-backed evidence; without it, this runs a real " +
+        "offline Naive Bayes classifier trained on the provided records instead (no external calls), which " +
+        "still surfaces genuine per-field signal but is weaker evidence than a real model.",
       inputSchema: {
         purpose: z.string().describe("Declared purpose of the AI task, in plain language, e.g. 'route a support ticket to the right queue'."),
         schema_sql: z.string().describe("A single CREATE TABLE ... statement for the table in question."),
