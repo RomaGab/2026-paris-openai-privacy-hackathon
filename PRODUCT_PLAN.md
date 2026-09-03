@@ -107,18 +107,27 @@ The benchmark service enriches this contract with observed results. The report g
 
 ## Benchmark integrity
 
-The central proof is a real comparison of two executions of the same task:
+The central proof is a four-condition comparison of the same labelled task:
+
+| Condition | Purpose |
+|---|---|
+| Full context | Establish the reference result with the complete declared record. |
+| Masking only | Establish what a masking layer removes without redesigning the record. |
+| Minimum context | Measure the unique contribution of purpose-specific minimization. |
+| Minimum context plus masking | Show the recommended combination: minimize first, then protect remaining text. |
 
 | Measure | Required evidence |
 |---|---|
-| Task quality | Exact match against declared labels, plus agreement between full and minimum-context outputs. |
-| Context reduction | Raw fields withheld, transformed, and retained. |
-| Token reduction | Actual input-token count for the exact model and payload used. |
-| Reproducibility | Corpus version, prompt, model, run time, and configuration. |
+| Task quality | Exact match against declared labels, individual decision changes, and stability versus full context. |
+| Context reduction | Field instances and raw structured PII values withheld, transformed, masked, and retained. |
+| Token reduction | Input-token count and its source for the exact prompt and payload used. |
+| Reproducibility | Exact observations, corpus and prompt hashes, model, masker, run time, and configuration. |
 
 A field may be recommended for blocking only when its removal or transformation causes **zero decision changes** on the declared corpus, unless the report explicitly records a review exception. Aggregate accuracy alone is insufficient because predictions can change while the aggregate score stays flat.
 
 All displayed benchmark numbers must come from an executed run. Synthetic data is acceptable when it is labelled as synthetic. If a run used a deterministic offline fallback, it is a technical dry run, not evidence about an LLM's data needs.
+
+The default structured-field masking baseline is not an OpenAI Privacy Filter evaluation. The optional OPF adapter must be selected explicitly. The primary differentiation remains `minimum context` versus `full context`; `minimum plus masking` versus `masking only` demonstrates that the layers are complementary. The complete design and commands are in [BENCHMARK.md](BENCHMARK.md).
 
 ## Report contents
 

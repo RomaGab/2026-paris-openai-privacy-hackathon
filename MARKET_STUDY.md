@@ -85,3 +85,5 @@ The demo should show a single use case end to end. A synthetic B2B SaaS support-
 6. Open the resulting Necessity Certificate.
 
 Every displayed number must come from the run shown or an explicitly identified prior run. The synthetic nature of the dataset and the limits of the result must be stated clearly.
+
+The benchmark should not attempt to outperform PII detectors on their own detection metric. Instead, it should compare four task conditions: full context, masking only, minimum context, and minimum context plus masking. The comparison between minimum context and full context measures our distinctive contribution. The comparison between minimum context plus masking and masking alone demonstrates a reusable layered architecture. See [BENCHMARK.md](BENCHMARK.md).

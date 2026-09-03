@@ -1,4 +1,4 @@
-"""Step A: differential-privacy-aware SQL minimization.
+"""Optional SQL minimization and storage-design artifact.
 
 Combines the counterfactual necessity evidence from minimize.py with a real
 SQL table definition and emits two artifacts:
@@ -12,12 +12,12 @@ SQL table definition and emits two artifacts:
      column (e.g. kept for human agent lookup, not for the AI call) is
      stored encrypted at rest via pgcrypto, never in plaintext.
 
-Retained columns go through one more, differential-privacy-style check
-before they are allowed into the AI view:
+Retained columns go through one more proposed transformation check before
+they are allowed into the AI view:
   - task-relevant, not personal  -> passes through unchanged
   - quasi-identifier             -> must be generalized (e.g. DOB -> age band)
   - direct identifier            -> must be pseudonymized (HMAC token)
-  - sensitive numeric            -> must get calibrated Laplace (DP) noise
+  - sensitive numeric            -> requires a separately designed mechanism
 
 None of our current retained fields (issue_description, product_area) are
 personal, so both pass straight through. The transforms below exist so
@@ -58,7 +58,7 @@ SECONDARY_RETENTION = {
 }
 
 # transform required for a retained-but-sensitive column before it may ever
-# reach the AI view (differential-privacy / anonymization layer).
+# reach the AI view (proposed pseudonymization or generalization layer).
 DP_TRANSFORM_BY_PRIVACY_COST = {
     "task-relevant, not personal": "none",
     "quasi-identifier": "generalize",
@@ -84,7 +84,7 @@ def parse_columns(ddl: str) -> List[str]:
 
 def ai_view_sql(all_columns: List[str], fields_retained: List[str]) -> str:
     """Columns allowed in the AI-facing view: proven necessary AND passed
-    the DP/anonymization check for their privacy cost."""
+    the proposed transformation check for their privacy cost."""
     selected = []
     for col in all_columns:
         if col not in fields_retained:
@@ -178,7 +178,7 @@ def main() -> None:
     fields_blocked = report["fields_blocked"]
 
     print(f"Base table columns ({len(all_columns)}): {all_columns}\n")
-    print("Differential-privacy / necessity audit per column:")
+    print("Proposed minimization and storage audit per column:")
     for row in dp_audit(all_columns, fields_retained, fields_blocked):
         print(f"  {row['column']}: {row['necessity']} | privacy cost: {row['privacy_cost']} | "
               f"transform: {row['required_transform']} | in AI view: {row['in_ai_view']}")

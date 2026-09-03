@@ -54,6 +54,13 @@ def accuracy(predictions: List[str], tickets: List[Dict[str, str]]) -> float:
     return correct / len(tickets)
 
 
+def recommend_field_action(changed_decisions: int) -> str:
+    """Return the review action derived from individual decision stability."""
+    if changed_decisions == 0:
+        return "block before the model call"
+    return "retain: changes measured decisions"
+
+
 def build_report(model: str = "gpt-4o-mini", use_openai: bool | None = None, verbose: bool = False) -> Dict:
     """Run the full baseline + per-field ablation study and return the report dict.
 
@@ -81,9 +88,8 @@ def build_report(model: str = "gpt-4o-mini", use_openai: bool | None = None, ver
         ablated_predictions, ablated_tokens = run_pass(tickets, model, use_openai, drop_field=field)
         ablated_accuracy = accuracy(ablated_predictions, tickets)
         changed = sum(b != a for b, a in zip(baseline_predictions, ablated_predictions))
-        degrades = ablated_accuracy < baseline_accuracy
-        action = "retain: required for task outcome" if degrades else "block before the model call"
-        if degrades:
+        action = recommend_field_action(changed)
+        if changed:
             retained_fields.append(field)
 
         card = {

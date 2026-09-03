@@ -2,5 +2,7 @@ __pycache__/
 *.pyc
 .env
 poc/report.json
+poc/benchmark-report.json
+poc/benchmark-report.md
 poc/step_a_output.sql
 poc/leakage_report.json

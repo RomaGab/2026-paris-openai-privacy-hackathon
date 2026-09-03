@@ -97,39 +97,59 @@ All displayed measurements are real and reproducible. The demonstration data is 
 
 ## Proof of concept
 
-The `poc/` folder currently implements the first measurement harness, using synthetic ticket routing:
+The `poc/` folder implements two complementary measurement paths using synthetic ticket routing:
 
 - `poc/data/synthetic_tickets.json`: 16 synthetic support tickets with the declared fields and an expected queue.
 - `poc/classifier.py`: the routing task. Uses the OpenAI API when `OPENAI_API_KEY` is set, otherwise falls back to a deterministic offline classifier so the demo runs with no key.
-- `poc/minimize.py`: runs the baseline, ablates each field one at a time, measures exact-match accuracy and tokens sent, and prints/saves an evidence card per field.
+- `poc/minimize.py`: runs per-field counterfactual ablations. A field is recommended for blocking only when its removal causes zero individual decision changes.
+- `poc/benchmark.py`: compares full context, masking alone, minimum context, and minimum context plus masking. It exports exact observations, utility scores, data-reduction measures, and limitations to JSON and Markdown.
 
-The next iteration replaces the simple raw-field removal scenario with the contextual use case above: purpose-specific facts are derived locally, reviewed, and enforced as the model payload.
-
-Run it:
+Run the dependency-free technical dry run:
 
 ```bash
-pip install -r poc/requirements.txt   # optional if you only use the offline fallback
+python poc/benchmark.py --engine offline --masker structured
+```
+
+Run the real-model benchmark after setting `OPENAI_API_KEY` outside the repository:
+
+```bash
+pip install -r poc/requirements.txt
+python poc/benchmark.py --engine openai --model gpt-4o-mini --masker structured
+```
+
+The default structured masker is a comparison baseline, not OpenAI Privacy Filter. An optional adapter runs the actual Privacy Filter model:
+
+```bash
+pip install -r poc/requirements-opf.txt
+python poc/benchmark.py --engine openai --model gpt-4o-mini --masker opf
+```
+
+The first OPF execution may download model weights, so cache them before a live demo. See [BENCHMARK.md](BENCHMARK.md) for the experimental design, formulas, acceptance rule, report schema, and claim boundaries. See [BENCHMARK_RESULTS.md](BENCHMARK_RESULTS.md) for the first recorded real-model iterations, including one rejected candidate contract and one accepted prototype contract.
+
+The per-field ablation remains available:
+
+```bash
 python poc/minimize.py
 ```
 
-This prints one evidence card per field and writes the full report, including a before/after payload, to `poc/report.json`.
-
-### Step A -- differential-privacy-aware SQL minimization
+### Optional architecture artifact: SQL minimization design
 
 `poc/sql_minimize.py` takes the necessity evidence from `minimize.py` and a real SQL table definition (`poc/data/tickets_schema.sql`) and emits:
 
 - an AI-facing `CREATE VIEW` containing only the columns proven necessary for the declared task (any column never covered by the necessity test is blocked by default, fail-closed);
 - a base-table DDL where every PII column kept only for a secondary, declared operational purpose (e.g. agent lookup) is stored encrypted at rest via pgcrypto, or generalized (date of birth to age band), never in plaintext or raw form.
 
-Retained-but-sensitive columns additionally go through a DP-style check before they can reach the AI view: direct identifiers must be pseudonymized, quasi-identifiers generalized, sensitive numerics get calibrated Laplace noise. Non-personal task fields pass through unchanged.
+The generated SQL is a proposed architecture artifact. It is not evidence of a deployed database control, differential privacy mechanism, or privacy accounting implementation.
 
 ```bash
 python poc/sql_minimize.py
 ```
 
-### Step B -- supplier data-leakage simulation
+### Optional scenario artifact: supplier data-leakage simulation
 
 `poc/leakage_simulation.py` runs a Monte Carlo simulation, over `poc/data/suppliers.json`, of what happens when suppliers who receive the Step A output actually leak data: 10,000 events, thousands of repetitions, two threat models (independent per-event leaks vs. one correlated breach exposing a whole batch), each compared with and without Step A minimization. Output is a probability of at least one real PII exposure, the expected number of exposed events, and a pass/fail verdict against a configurable risk threshold.
+
+These probabilities come from declared assumptions, not observed incidents. They must not be presented as measured product impact.
 
 ```bash
 python poc/leakage_simulation.py --events 10000 --threshold 0.01

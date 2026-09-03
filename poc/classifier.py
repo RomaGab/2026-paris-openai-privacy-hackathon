@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import re
+from dataclasses import dataclass
 from typing import Dict, Optional
 
 QUEUES = [
@@ -57,6 +58,15 @@ _KEYWORDS = {
 }
 
 
+@dataclass(frozen=True)
+class ClassificationResult:
+    """One model decision plus the evidence needed for token accounting."""
+
+    prediction: str
+    input_tokens: int
+    token_source: str
+
+
 def _matches(text: str, queue: str) -> bool:
     text = text.lower()
     return any(kw in text for kw in _KEYWORDS[queue])
@@ -89,29 +99,55 @@ def _build_prompt(record: Dict[str, str]) -> str:
     )
 
 
-def classify_openai(record: Dict[str, str], model: str) -> str:
+def classify_openai_measured(record: Dict[str, str], model: str) -> ClassificationResult:
     from openai import OpenAI  # imported lazily so the offline path has no hard dependency
 
     client = OpenAI()
+    prompt = _build_prompt(record)
     response = client.chat.completions.create(
         model=model,
-        messages=[{"role": "user", "content": _build_prompt(record)}],
+        messages=[{"role": "user", "content": prompt}],
         temperature=0,
     )
     text = (response.choices[0].message.content or "").strip().lower()
     match = re.search("|".join(QUEUES), text)
-    return match.group(0) if match else "general_inquiry"
+    prediction = match.group(0) if match else "general_inquiry"
+    usage = getattr(response, "usage", None)
+    api_tokens = getattr(usage, "prompt_tokens", None) if usage else None
+    if api_tokens is not None:
+        return ClassificationResult(prediction, int(api_tokens), "api_usage")
+    token_count, token_source = count_tokens_with_source(prompt, model=model)
+    return ClassificationResult(prediction, token_count, token_source)
 
 
-def classify(record: Dict[str, str], model: str = "gpt-4o-mini", use_openai: Optional[bool] = None) -> str:
+def classify_openai(record: Dict[str, str], model: str) -> str:
+    return classify_openai_measured(record, model).prediction
+
+
+def classify_measured(
+    record: Dict[str, str],
+    model: str = "gpt-4o-mini",
+    use_openai: Optional[bool] = None,
+) -> ClassificationResult:
+    """Classify one record and return its input-token accounting evidence."""
     if use_openai is None:
         use_openai = bool(os.environ.get("OPENAI_API_KEY"))
     if use_openai:
-        return classify_openai(record, model)
-    return classify_rule_based(record)
+        return classify_openai_measured(record, model)
+    prompt = _build_prompt(record)
+    token_count, token_source = count_tokens_with_source(prompt, model=model)
+    return ClassificationResult(
+        classify_rule_based(record),
+        token_count,
+        token_source,
+    )
 
 
-def count_tokens(text: str, model: str = "gpt-4o-mini") -> int:
+def classify(record: Dict[str, str], model: str = "gpt-4o-mini", use_openai: Optional[bool] = None) -> str:
+    return classify_measured(record, model=model, use_openai=use_openai).prediction
+
+
+def count_tokens_with_source(text: str, model: str = "gpt-4o-mini") -> tuple[int, str]:
     try:
         import tiktoken
 
@@ -119,6 +155,10 @@ def count_tokens(text: str, model: str = "gpt-4o-mini") -> int:
             encoding = tiktoken.encoding_for_model(model)
         except KeyError:
             encoding = tiktoken.get_encoding("cl100k_base")
-        return len(encoding.encode(text))
-    except ImportError:
-        return len(text.split())
+        return len(encoding.encode(text)), "tiktoken"
+    except Exception:
+        return len(text.split()), "whitespace_estimate"
+
+
+def count_tokens(text: str, model: str = "gpt-4o-mini") -> int:
+    return count_tokens_with_source(text, model=model)[0]
