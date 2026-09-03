@@ -42,9 +42,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import re
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -178,18 +179,88 @@ def payload(record: Dict, input_fields: List[str], drop_field: Optional[str] = N
     return {k: record.get(k) for k in input_fields if k != drop_field}
 
 
+def tokenize(text: str) -> List[str]:
+    """Tokenize task context while discarding identifier-like numeric tokens."""
+    return [word for word in re.findall(r"[a-z0-9]+", text.lower()) if not word.isdigit()]
+
+
+def train_bow(records, input_fields, label_field, drop_field, label_values):
+    """Train a small multinomial Naive Bayes model for the no-key demo."""
+    classes = list(dict.fromkeys(label_values or []))
+    doc_count_by_class = Counter()
+    word_count_by_class = defaultdict(Counter)
+    total_words_by_class = Counter()
+    per_record_tokens = []
+    document_frequency = Counter()
+
+    for record in records:
+        label = record.get(label_field)
+        if label is None:
+            continue
+        class_name = str(label)
+        if class_name not in classes:
+            classes.append(class_name)
+        words = tokenize(" ".join(str(value) for value in payload(
+            record, input_fields, drop_field
+        ).values() if value is not None))
+        per_record_tokens.append((class_name, words))
+        document_frequency.update(set(words))
+
+    vocabulary = set()
+    for class_name, words in per_record_tokens:
+        doc_count_by_class[class_name] += 1
+        for word in words:
+            if document_frequency[word] < 2:
+                continue
+            vocabulary.add(word)
+            word_count_by_class[class_name][word] += 1
+            total_words_by_class[class_name] += 1
+
+    return {
+        "classes": classes,
+        "doc_count_by_class": doc_count_by_class,
+        "word_count_by_class": word_count_by_class,
+        "total_words_by_class": total_words_by_class,
+        "vocabulary_size": max(len(vocabulary), 1),
+        "total_docs": len(per_record_tokens),
+    }
+
+
+def predict_bow(model, record, input_fields, drop_field, fallback):
+    if not model["classes"]:
+        return fallback or ""
+    words = tokenize(" ".join(str(value) for value in payload(
+        record, input_fields, drop_field
+    ).values() if value is not None))
+    best_class = fallback or model["classes"][0]
+    best_score = float("-inf")
+
+    for class_name in model["classes"]:
+        prior = model["doc_count_by_class"][class_name] + 1
+        score = math.log(prior / (model["total_docs"] + len(model["classes"])))
+        denominator = model["total_words_by_class"][class_name] + model["vocabulary_size"]
+        for word in words:
+            score += math.log((model["word_count_by_class"][class_name][word] + 1) / denominator)
+        if score > best_score:
+            best_score = score
+            best_class = class_name
+    return best_class
+
+
 def run_pass(records, input_fields, purpose, label_field, label_values, model, use_openai,
              majority_label, drop_field=None):
     predictions, tokens_sent = [], 0
+    bow_model = None if use_openai else train_bow(
+        records, input_fields, label_field, drop_field, label_values
+    )
     for record in records:
         p = payload(record, input_fields, drop_field)
         if use_openai:
             prediction = run_task_llm(purpose, label_field, label_values, p, model)
         else:
-            # Offline dry run: always predicts the majority class, so it can
-            # only ever show "no field changes the decision". Good for
-            # exercising the pipeline's plumbing, not for real evidence.
-            prediction = majority_label
+            prediction = predict_bow(
+                bow_model, record, input_fields, drop_field, majority_label
+            )
         predictions.append(prediction)
         tokens_sent += count_tokens(json.dumps(p, default=str), model)
     return predictions, tokens_sent
@@ -213,7 +284,7 @@ def build_report(purpose: str, table_name: str, input_fields: List[str], records
     baseline_accuracy = accuracy(baseline_predictions, records, label_field)
 
     if verbose:
-        engine = f"OpenAI ({model})" if use_openai else "offline majority-class baseline (dry run only)"
+        engine = f"OpenAI ({model})" if use_openai else "offline Naive Bayes baseline (no LLM)"
         print(f"Engine: {engine}")
         print(f"Declared purpose: {purpose}")
         print(f"Declared test set: {n} labeled records")
@@ -230,8 +301,8 @@ def build_report(purpose: str, table_name: str, input_fields: List[str], records
         )
         ablated_accuracy = accuracy(ablated_predictions, records, label_field)
         changed = sum(b != a for b, a in zip(baseline_predictions, ablated_predictions))
-        degrades = ablated_accuracy < baseline_accuracy
-        if degrades:
+        changes_outcome = changed > 0
+        if changes_outcome:
             fields_retained.append(field)
             transform = DP_TRANSFORM_BY_PRIVACY_COST[privacy_cost]
             action = "retain: required for task outcome" if transform == "none" else (
@@ -272,7 +343,10 @@ def build_report(purpose: str, table_name: str, input_fields: List[str], records
     return {
         "purpose": purpose,
         "table_name": table_name,
-        "engine": ("openai:" + model) if use_openai else "offline_majority_class_baseline (dry run only)",
+        "engine": ("openai:" + model) if use_openai else (
+            "offline_bag_of_words_baseline (no LLM; a Naive Bayes model trained on the provided "
+            "records, for a no-key demo; use a real model for production evidence)"
+        ),
         "test_set_size": n,
         "baseline_accuracy": baseline_accuracy,
         "baseline_tokens_total": baseline_tokens,
@@ -307,11 +381,16 @@ def ai_view_sql(table_name: str, pk_column: str, all_columns: List[str], fields_
             )
     selected_cols = [c for c in lines if not c.startswith("--")]
     header = "\n".join(f"    {c}" for c in lines if c.startswith("--"))
-    select_clause = f"    {pk_column}" + (",\n    " + ",\n    ".join(selected_cols) if selected_cols else "")
+    select_clause = (
+        "    " + ",\n    ".join(selected_cols)
+        if selected_cols
+        else "    NULL::TEXT AS no_approved_fields"
+    )
+    where_clause = "" if selected_cols else "\nWHERE FALSE"
     return (
         f"-- AI-facing view: only necessity-proven, already-safe-to-expose columns\n"
         f"CREATE VIEW {table_name}_ai_view AS\n"
-        f"SELECT\n{select_clause}\nFROM {table_name};\n"
+        f"SELECT\n{select_clause}\nFROM {table_name}{where_clause};\n"
         + (f"{header}\n" if header else "")
     )
 

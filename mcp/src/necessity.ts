@@ -363,6 +363,10 @@ export interface NecessityReport {
   example_before_after: { full_payload: Record_; minimized_payload: Record_ };
 }
 
+export function shouldRetainField(changedDecisions: number): boolean {
+  return changedDecisions > 0;
+}
+
 export async function buildReport(opts: {
   purpose: string;
   tableName: string;
@@ -413,10 +417,10 @@ export async function buildReport(opts: {
     const ablatedAccuracy = accuracy(ablated.predictions, records, labelField);
     let changed = 0;
     for (let i = 0; i < n; i++) if (baseline.predictions[i] !== ablated.predictions[i]) changed++;
-    const degrades = ablatedAccuracy < baselineAccuracy;
+    const changesOutcome = shouldRetainField(changed);
 
     let action: string;
-    if (degrades) {
+    if (changesOutcome) {
       fieldsRetained.push(field);
       const transform = DP_TRANSFORM_BY_PRIVACY_COST[privacyCost];
       action =
@@ -493,12 +497,14 @@ export function aiViewSql(
     .filter((l) => l.startsWith("--"))
     .map((l) => `    ${l}`)
     .join("\n");
-  const selectClause =
-    `    ${pkColumn}` + (selectedCols.length ? ",\n    " + selectedCols.join(",\n    ") : "");
+  const selectClause = selectedCols.length
+    ? `    ${selectedCols.join(",\n    ")}`
+    : "    NULL::TEXT AS no_approved_fields";
+  const whereClause = selectedCols.length ? "" : "\nWHERE FALSE";
   return (
     `-- AI-facing view: only necessity-proven, already-safe-to-expose columns\n` +
     `CREATE VIEW ${tableName}_ai_view AS\n` +
-    `SELECT\n${selectClause}\nFROM ${tableName};\n` +
+    `SELECT\n${selectClause}\nFROM ${tableName}${whereClause};\n` +
     (header ? `${header}\n` : "")
   );
 }
