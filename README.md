@@ -108,6 +108,15 @@ python poc/sql_minimize.py
 python poc/leakage_simulation.py --events 10000 --threshold 0.01
 ```
 
+### Storyboard video
+
+`demo/generate_video.py` turns a 7-scene storyboard (`demo/storyboard.json`) of the Step A minimization story into a narrated-by-captions video: an illustration per scene generated via OpenRouter (falls back to an offline placeholder card if `OPENROUTER_API_KEY` is unset), rendered as a Ken Burns clip, crossfaded into `demo/storyboard_video.mp4`.
+
+```bash
+export OPENROUTER_API_KEY=sk-or-...   # optional, else offline fallback frames
+python demo/generate_video.py
+```
+
 ## Market landscape
 
 The project builds on established detection, governance, policy, and evaluation techniques. Its differentiated contribution is connecting a declared purpose, counterfactual task measurement, an enforced minimal payload, and a reproducible evidence certificate. See [MARKET_STUDY.md](MARKET_STUDY.md).
