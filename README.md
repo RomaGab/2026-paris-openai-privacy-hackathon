@@ -10,7 +10,7 @@
 
 Privacy by design means minimizing data use before processing, not filtering it afterwards. In practice, most AI systems fail this test: they are commonly given whole records, such as a support ticket, application, or customer profile, that can contain direct identifiers and sensitive context irrelevant to the requested decision.
 
-Most privacy tooling answers an important but different question: **what looks personal?** It detects, masks, pseudonymises, or redacts personal data after collection, once it has already reached the system boundary. This is privacy by reaction, not privacy by design.
+PII tooling answers an important but different question: **what looks personal?** It can detect and mask personal data before an external model call. Detection is a useful component, but it does not establish whether a task needs the data, whether a less identifying fact would suffice, or whether the reduced payload preserves task quality.
 
 The question we need to answer instead, upfront and by construction, is: **what is the smallest context this specific AI task needs?**
 
@@ -39,15 +39,42 @@ Observed effect: [K] expected decisions changed
 Operational action: derive the plan locally; block the raw ID before the model call
 ```
 
-## How it differs from PII filtering
+## Why this is more than OpenAI Privacy Filter
 
-| PII filtering | Necessity Certificate |
-|---|---|
-| What data is personal? | What minimal context is necessary for this declared task? |
-| Detect or mask data | Test, generalise, derive, or block data before the model call |
-| A detection result | A reproducible minimization certificate |
+[OpenAI Privacy Filter](https://huggingface.co/openai/privacy-filter) is a local PII detection and masking model. It identifies sensitive spans such as names, email addresses, phone numbers, addresses, account numbers, dates, URLs, and secrets. It does not know the declared business purpose of an AI call or test which context preserves the task outcome.
 
-These approaches are complementary. A PII detector can identify a field's privacy cost, especially in free text. This project determines whether a raw field should cross the AI boundary at all, or whether a less identifying fact is sufficient.
+| Question | OpenAI Privacy Filter | Minimum Viable Data + Necessity Certificate |
+|---|---|---|
+| What is the input? | Text to inspect for PII spans. | A declared AI purpose, data schema, expected outcome, and test corpus. |
+| What decision is made? | Which spans match the privacy-label taxonomy. | Which inputs to retain, block, generalise, or replace with locally derived facts. |
+| Is task utility measured? | No. | Yes: full context and minimum context run against the same expected outcomes. |
+| Is the result enforced? | Detected spans can be masked. | A reviewed context contract controls the complete payload sent to the model. |
+| What artifact is produced? | Detected or masked spans. | A reproducible certificate containing purpose, field actions, benchmark evidence, payload, and limitations. |
+
+Concrete example:
+
+```text
+Raw system record:
+  account_id = ACC-123
+  email = alice@example.com
+  subscription_plan = Pro
+  invoice_status = overdue
+
+OpenAI Privacy Filter:
+  detects or masks account_id and email
+
+Minimum Viable Data + Necessity Certificate:
+  declared purpose = prioritise a billing request
+  derives locally = subscription_plan, invoice_status
+  sends to model = subscription_plan, invoice_status, issue description
+  blocks from model = account_id, email, name, address
+  measures = whether the expected billing decision stays unchanged
+  records = the benchmark and exact minimal payload
+```
+
+OPF can remain an optional first-layer detector for PII embedded in free text. Our differentiated layer starts after detection: **purpose-specific context design, measured utility preservation, payload enforcement, and evidence generation.**
+
+If the demo only highlights masking an email address, it will look like a PII-filter demo. The distinctive moment is showing a raw identifier replaced by a useful fact, the task outcome remaining stable, and the resulting context contract being enforced.
 
 ## What we can prove
 

@@ -34,6 +34,25 @@ The first screen follows the Minimum Viable Data principles:
 
 These principles make privacy by design concrete before the model is called.
 
+## Relationship with OpenAI Privacy Filter
+
+OpenAI Privacy Filter and this product solve different layers of the problem:
+
+```text
+OpenAI Privacy Filter
+→ detect or mask PII spans
+
+Minimum Viable Data
+→ connect every input to a declared feature and purpose
+
+Necessity Certificate
+→ test the minimum context, enforce the resulting payload, and record the evidence
+```
+
+OPF may be used to inspect free text inside the workflow. It does not replace the purpose declaration, context transformation, utility benchmark, reviewed context contract, or final certificate.
+
+The demo must therefore show at least one action beyond masking: a raw value is blocked, generalised, or converted locally into a less identifying fact, and the task is rerun to measure the effect.
+
 ## One workflow, two entry modes
 
 ### Mode 1: Build a new AI feature
