@@ -44,7 +44,10 @@ scenarios:
     steps:
       - action: navigate
         url: "http://127.0.0.1:8931/index.html"
-        wait: 1.2
+        wait: 0.8
+
+      - action: pause
+        wait: 15.0
         narration: "AI needs context, not identity. This is the Necessity Certificate: turning a raw customer record into the smallest purpose-specific facts an AI task actually needs, with evidence for every field it leaves behind."
         camera:
           target:
@@ -52,7 +55,7 @@ scenarios:
             value: "#hero h1"
           zoom: 1.15
           duration: 1.0
-          hold: 1.2
+          hold: 3.0
         effects:
           - type: fade_in
             duration: 0.8
@@ -63,11 +66,19 @@ scenarios:
           - type: film_grain
             intensity: 0.1
 
+      - action: camera
+        camera:
+          reset: true
+          duration: 0.4
+
       - action: scroll
         direction: "down"
         pixels: 1080
         smooth_scroll: true
-        wait: 0.6
+        wait: 0.4
+
+      - action: pause
+        wait: 16.0
         narration: "Most privacy tooling asks what looks personal, and reacts after data has already reached the AI system. We ask a different question, upfront and by construction: does this declared task actually need this field at all?"
         camera:
           target:
@@ -75,7 +86,7 @@ scenarios:
             value: "#problem h2"
           zoom: 1.1
           duration: 0.8
-          hold: 0.8
+          hold: 3.5
         effects:
           - type: color_grade
             preset: "cinematic"
@@ -84,11 +95,19 @@ scenarios:
           - type: film_grain
             intensity: 0.1
 
+      - action: camera
+        camera:
+          reset: true
+          duration: 0.4
+
       - action: scroll
         direction: "down"
         pixels: 1080
         smooth_scroll: true
-        wait: 0.6
+        wait: 0.4
+
+      - action: pause
+        wait: 19.0
         narration: "Sixteen synthetic support tickets, one fixed routing model. Each field is removed, one at a time, and the task is rerun. Task-relevant fields like the issue description earn their place. Direct identifiers like name, email, or account ID never do."
         camera:
           target:
@@ -96,7 +115,7 @@ scenarios:
             value: "#evidence table"
           zoom: 1.12
           duration: 0.9
-          hold: 1.6
+          hold: 4.5
         effects:
           - type: color_grade
             preset: "cinematic"
@@ -105,11 +124,19 @@ scenarios:
           - type: film_grain
             intensity: 0.1
 
+      - action: camera
+        camera:
+          reset: true
+          duration: 0.4
+
       - action: scroll
         direction: "down"
         pixels: 1080
         smooth_scroll: true
-        wait: 0.6
+        wait: 0.4
+
+      - action: pause
+        wait: 13.5
         narration: "That necessity evidence becomes enforced SQL. An AI-facing view exposes only proven columns, fail-closed by default, while blocked personal data stays encrypted at rest and never reaches the model."
         camera:
           target:
@@ -117,7 +144,7 @@ scenarios:
             value: "#stepa .grid"
           zoom: 1.05
           duration: 0.9
-          hold: 1.6
+          hold: 4.0
         effects:
           - type: color_grade
             preset: "cinematic"
@@ -126,11 +153,19 @@ scenarios:
           - type: film_grain
             intensity: 0.1
 
+      - action: camera
+        camera:
+          reset: true
+          duration: 0.4
+
       - action: scroll
         direction: "down"
         pixels: 1080
         smooth_scroll: true
-        wait: 0.6
+        wait: 0.4
+
+      - action: pause
+        wait: 16.0
         narration: "Does it hold up if a supplier leaks the data? A ten thousand event Monte Carlo simulation shows the probability of a real exposure drops from ninety-nine point seven percent to fifty-eight percent once minimization is applied."
         camera:
           target:
@@ -138,7 +173,7 @@ scenarios:
             value: "#stepb .row"
           zoom: 1.1
           duration: 0.9
-          hold: 1.6
+          hold: 4.5
         effects:
           - type: color_grade
             preset: "cinematic"
@@ -147,11 +182,19 @@ scenarios:
           - type: vignette
             intensity: 0.2
 
+      - action: camera
+        camera:
+          reset: true
+          duration: 0.4
+
       - action: scroll
         direction: "down"
         pixels: 1080
         smooth_scroll: true
-        wait: 0.6
+        wait: 0.4
+
+      - action: pause
+        wait: 14.3
         narration: "Existing tools find sensitive data. We turn task evidence into an enforced, minimal AI context. Build AI that needs less, and show the evidence for every field it leaves behind."
         camera:
           target:
@@ -159,12 +202,18 @@ scenarios:
             value: "#pitch h2"
           zoom: 1.1
           duration: 0.9
-          hold: 2.0
+          hold: 2.5
         effects:
           - type: color_grade
             preset: "cinematic"
           - type: confetti
             duration: 2.0
+
+      - action: camera
+        camera:
+          reset: true
+          duration: 0.6
+        effects:
           - type: fade_out
             duration: 1.0
 
