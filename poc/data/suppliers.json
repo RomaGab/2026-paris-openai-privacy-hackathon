@@ -1,0 +1,25 @@
+[
+  {
+    "name": "llm_routing_vendor",
+    "surface": "ai_view",
+    "leak_probability_per_event": 0.0005,
+    "breach_probability_per_batch": 0.01,
+    "notes": "Receives only the Step A minimized view (issue_description, product_area). No structured PII column ever reaches this supplier."
+  },
+  {
+    "name": "cloud_storage_provider",
+    "surface": "encrypted_at_rest",
+    "leak_probability_per_event": 0.0002,
+    "key_compromise_probability_given_leak": 0.01,
+    "breach_probability_per_batch": 0.02,
+    "notes": "Hosts encrypted backups of the full base table. Keys are held in a separate KMS, not co-located with the data."
+  },
+  {
+    "name": "subcontracted_support_desk",
+    "surface": "encrypted_at_rest",
+    "leak_probability_per_event": 0.001,
+    "key_compromise_probability_given_leak": 0.05,
+    "breach_probability_per_batch": 0.05,
+    "notes": "Human agents decrypt PII columns on demand via KMS-gated access; broader human access raises key-compromise risk versus pure storage."
+  }
+]

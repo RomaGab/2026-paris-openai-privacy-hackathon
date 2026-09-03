@@ -54,28 +54,31 @@ def accuracy(predictions: List[str], tickets: List[Dict[str, str]]) -> float:
     return correct / len(tickets)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model", default="gpt-4o-mini")
-    parser.add_argument("--out", default=str(Path(__file__).parent / "report.json"))
-    args = parser.parse_args()
+def build_report(model: str = "gpt-4o-mini", use_openai: bool | None = None, verbose: bool = False) -> Dict:
+    """Run the full baseline + per-field ablation study and return the report dict.
 
-    use_openai = bool(os.environ.get("OPENAI_API_KEY"))
+    This is the single source of necessity evidence reused by Step A
+    (poc/sql_minimize.py) so that the SQL/encryption decisions are always
+    derived from the same counterfactual test, not a second guess.
+    """
+    if use_openai is None:
+        use_openai = bool(os.environ.get("OPENAI_API_KEY"))
     tickets = load_tickets()
     n = len(tickets)
 
-    baseline_predictions, baseline_tokens = run_pass(tickets, args.model, use_openai)
+    baseline_predictions, baseline_tokens = run_pass(tickets, model, use_openai)
     baseline_accuracy = accuracy(baseline_predictions, tickets)
 
-    print(f"Engine: {'OpenAI (' + args.model + ')' if use_openai else 'offline rule-based fallback'}")
-    print(f"Declared test set: {n} synthetic tickets")
-    print(f"Baseline exact-match accuracy: {baseline_accuracy:.0%}")
-    print(f"Baseline tokens sent (full record, all tickets): {baseline_tokens}\n")
+    if verbose:
+        print(f"Engine: {'OpenAI (' + model + ')' if use_openai else 'offline rule-based fallback'}")
+        print(f"Declared test set: {n} synthetic tickets")
+        print(f"Baseline exact-match accuracy: {baseline_accuracy:.0%}")
+        print(f"Baseline tokens sent (full record, all tickets): {baseline_tokens}\n")
 
     evidence_cards = []
     retained_fields = []
     for field in FIELDS:
-        ablated_predictions, ablated_tokens = run_pass(tickets, args.model, use_openai, drop_field=field)
+        ablated_predictions, ablated_tokens = run_pass(tickets, model, use_openai, drop_field=field)
         ablated_accuracy = accuracy(ablated_predictions, tickets)
         changed = sum(b != a for b, a in zip(baseline_predictions, ablated_predictions))
         degrades = ablated_accuracy < baseline_accuracy
@@ -96,19 +99,20 @@ def main() -> None:
         }
         evidence_cards.append(card)
 
-        print(f"Field: {field}")
-        print(f"  Declared purpose: route a support ticket")
-        print(f"  Privacy cost: {card['privacy_cost']}")
-        print(f"  Counterfactual test: {card['counterfactual_test']}")
-        print(f"  Observed effect: {card['observed_effect']} (accuracy {card['accuracy_with_field']} -> {card['accuracy_without_field']})")
-        print(f"  Operational action: {action}\n")
+        if verbose:
+            print(f"Field: {field}")
+            print(f"  Declared purpose: route a support ticket")
+            print(f"  Privacy cost: {card['privacy_cost']}")
+            print(f"  Counterfactual test: {card['counterfactual_test']}")
+            print(f"  Observed effect: {card['observed_effect']} (accuracy {card['accuracy_with_field']} -> {card['accuracy_without_field']})")
+            print(f"  Operational action: {action}\n")
 
     example = tickets[0]
     full_payload = payload(example)
     minimized_payload = {k: v for k, v in full_payload.items() if k in retained_fields}
 
-    report = {
-        "engine": "openai:" + args.model if use_openai else "offline_rule_based",
+    return {
+        "engine": "openai:" + model if use_openai else "offline_rule_based",
         "test_set_size": n,
         "baseline_accuracy": baseline_accuracy,
         "baseline_tokens_total": baseline_tokens,
@@ -122,6 +126,14 @@ def main() -> None:
         },
     }
 
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model", default="gpt-4o-mini")
+    parser.add_argument("--out", default=str(Path(__file__).parent / "report.json"))
+    args = parser.parse_args()
+
+    report = build_report(model=args.model, verbose=True)
     out_path = Path(args.out)
     out_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
 

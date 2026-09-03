@@ -87,6 +87,27 @@ python poc/minimize.py
 
 This prints one evidence card per field and writes the full report, including a before/after payload, to `poc/report.json`.
 
+### Step A -- differential-privacy-aware SQL minimization
+
+`poc/sql_minimize.py` takes the necessity evidence from `minimize.py` and a real SQL table definition (`poc/data/tickets_schema.sql`) and emits:
+
+- an AI-facing `CREATE VIEW` containing only the columns proven necessary for the declared task (any column never covered by the necessity test is blocked by default, fail-closed);
+- a base-table DDL where every PII column kept only for a secondary, declared operational purpose (e.g. agent lookup) is stored encrypted at rest via pgcrypto, or generalized (date of birth to age band), never in plaintext or raw form.
+
+Retained-but-sensitive columns additionally go through a DP-style check before they can reach the AI view: direct identifiers must be pseudonymized, quasi-identifiers generalized, sensitive numerics get calibrated Laplace noise. Non-personal task fields pass through unchanged.
+
+```bash
+python poc/sql_minimize.py
+```
+
+### Step B -- supplier data-leakage simulation
+
+`poc/leakage_simulation.py` runs a Monte Carlo simulation, over `poc/data/suppliers.json`, of what happens when suppliers who receive the Step A output actually leak data: 10,000 events, thousands of repetitions, two threat models (independent per-event leaks vs. one correlated breach exposing a whole batch), each compared with and without Step A minimization. Output is a probability of at least one real PII exposure, the expected number of exposed events, and a pass/fail verdict against a configurable risk threshold.
+
+```bash
+python poc/leakage_simulation.py --events 10000 --threshold 0.01
+```
+
 ## Market landscape
 
 The project builds on established detection, governance, policy, and evaluation techniques. Its differentiated contribution is connecting a declared purpose, counterfactual task measurement, an enforced minimal payload, and a reproducible evidence certificate. See [MARKET_STUDY.md](MARKET_STUDY.md).
