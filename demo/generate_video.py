@@ -67,7 +67,7 @@ def find_font() -> str:
 
 
 def _curl_json(args: List[str], timeout: int) -> Dict:
-    result = subprocess.run(["curl", "-sS", "--max-time", str(timeout), *args],
+    result = subprocess.run(["curl", "-sS", "--fail", "--max-time", str(timeout), *args],
                             capture_output=True, text=True, check=True)
     return json.loads(result.stdout)
 
@@ -75,12 +75,12 @@ def _curl_json(args: List[str], timeout: int) -> Dict:
 def generate_clip_openrouter(prompt: str, model: str, seconds: int, out_path: Path, timeout_s: int = 600) -> bool:
     """Direct call to OpenRouter's video generation API. Returns a real, animated clip.
 
-    Uses curl (subprocess) rather than urllib: urllib requests consistently got
-    rejected by OpenRouter's Cloudflare/Clerk auth layer on the poll/download
-    steps ("Failed to authenticate request with Clerk") even with a valid API
-    key, a real User-Agent, and a shared cookie jar -- an identical curl call
-    to the same endpoints succeeded every time, pointing at a TLS/HTTP2
-    fingerprint check rather than a real credentials problem.
+    Uses curl (subprocess) rather than urllib: urllib requests to the create/poll
+    endpoints were intermittently rejected by a Cloudflare/Clerk auth layer even
+    with a valid API key, while curl succeeded consistently (looked like a
+    TLS/HTTP2 fingerprint check). Separately, the "unsigned_urls" the API
+    returns for the finished clip are not actually unauthenticated -- they are
+    OpenRouter API endpoints that still need the same Bearer token.
     """
     api_key = os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
@@ -113,7 +113,10 @@ def generate_clip_openrouter(prompt: str, model: str, seconds: int, out_path: Pa
         if not urls:
             print(f"  [openrouter-video] {out_path.stem}: no video URL returned, falling back")
             return False
-        subprocess.run(["curl", "-sS", "--max-time", "120", "-o", str(out_path), urls[0]], check=True)
+        # Despite the field name, these URLs are OpenRouter API endpoints that
+        # still require the same Bearer token as the create/poll calls.
+        subprocess.run(["curl", "-sS", "--fail", "--max-time", "120", "-H", auth_header,
+                        "-o", str(out_path), urls[0]], check=True)
         return True
     except (subprocess.CalledProcessError, KeyError, IndexError, ValueError) as e:
         print(f"  [openrouter-video] {out_path.stem}: request failed ({e}), falling back to offline placeholder clip")

@@ -110,10 +110,10 @@ python poc/leakage_simulation.py --events 10000 --threshold 0.01
 
 ### Storyboard video
 
-`demo/generate_video.py` turns a 7-scene storyboard (`demo/storyboard.json`) of the Step A minimization story into a narrated-by-captions video: an illustration per scene generated via OpenRouter (falls back to an offline placeholder card if `OPENROUTER_API_KEY` is unset), rendered as a Ken Burns clip, crossfaded into `demo/storyboard_video.mp4`.
+`demo/generate_video.py` turns a 7-scene storyboard (`demo/storyboard.json`) of the Step A minimization story into a real generated video, not a slideshow: each scene is a genuine animated clip from OpenRouter's direct video generation API (`minimax/hailuo-3-max` by default), captioned and crossfaded into `demo/storyboard_video.mp4`. Falls back to an offline Ken Burns still-card per scene if `OPENROUTER_API_KEY` is unset or a scene's generation call fails.
 
 ```bash
-export OPENROUTER_API_KEY=sk-or-...   # optional, else offline fallback frames
+export OPENROUTER_API_KEY=sk-or-...   # optional, else offline fallback clips
 python demo/generate_video.py
 ```
 
