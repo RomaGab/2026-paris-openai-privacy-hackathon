@@ -1,0 +1,53 @@
+[
+  {
+    "id": "prompt_codex",
+    "title": "Prompt Codex to build a website",
+    "caption": "A developer asks Codex to build a website.",
+    "duration": 4,
+    "video_prompt": "A sleek dark navy tech animation: a person's hand types on a glowing keyboard in front of a large terminal-like chat window, a blinking text cursor and abstract wavy lines representing a typed message form inside a chat bubble, the bubble rises and streams upward into a glowing AI orb hovering above the screen. Mint green and light blue accent glow on a near-black background. Minimal flat geometric design, no readable text or letters anywhere in frame."
+  },
+  {
+    "id": "codex_generates",
+    "title": "Codex generates the app",
+    "caption": "Codex generates a working app end to end.",
+    "duration": 4,
+    "video_prompt": "A sleek dark navy tech animation: a glowing AI orb pulses and streams abstract thin glowing horizontal bars (representing code, not real letters) cascading downward, assembling piece by piece into a browser-window icon with a navbar, a form, and a dashboard grid appearing on screen. Camera slowly pushes in. Mint green accent glow on a near-black background. Minimal flat geometric design, no readable text or letters anywhere in frame."
+  },
+  {
+    "id": "pii_database",
+    "title": "A database full of PII",
+    "caption": "By default, the generated database stores every field as raw PII.",
+    "duration": 4,
+    "video_prompt": "A sleek dark navy tech animation: the browser window dissolves to reveal a large glowing database table behind it, its columns light up one by one in warning red and amber, each topped by a small icon (person silhouette, envelope, phone, calendar, house, ID card), a warning triangle pulses above the table. Camera slowly pushes in. Red and amber accent glow on a near-black background. Minimal flat geometric design, no readable text or letters anywhere in frame."
+  },
+  {
+    "id": "skill_arrives",
+    "title": "Attach the Necessity Certificate skill",
+    "caption": "Attach one skill: the Necessity Certificate.",
+    "duration": 4,
+    "video_prompt": "A sleek dark navy tech animation: a glowing document-shaped file icon marked with a small shield-and-checkmark emblem slides in from the side and docks into the AI orb, the orb absorbs it and pulses brighter mint green, thin circuit-board light lines spread outward from the orb. Camera slowly orbits. Mint green accent glow on a near-black background. Minimal flat geometric design, no readable text or letters anywhere in frame."
+  },
+  {
+    "id": "re_run",
+    "title": "Codex reruns the task",
+    "caption": "Codex reruns the task, now testing every field for necessity.",
+    "duration": 4,
+    "video_prompt": "A sleek dark navy tech animation: the same hand types on the glowing keyboard again, the same chat bubble rises into the now brighter AI orb, the orb responds with a scanning beam that sweeps across a database table, small checkmark and X glyphs flash above each column one by one as the beam passes. Mint green and light blue accent glow on a near-black background. Minimal flat geometric design, no readable text or letters anywhere in frame."
+  },
+  {
+    "id": "clean_database",
+    "title": "A minimized, evidence-backed database",
+    "caption": "The rebuilt app ships with a minimized, evidence-backed database.",
+    "duration": 4,
+    "video_prompt": "A sleek dark navy tech animation: a database table transforms, most columns shrink and fade away leaving only two narrow glowing columns feeding into the AI orb, the remaining identifier-style columns lock behind a small vault padlock icon at the side, green checkmarks pulse over the two safe columns. Camera slowly pulls back to reveal the tidy result. Mint green accent glow on a near-black background. Minimal flat geometric design, no readable text or letters anywhere in frame."
+  },
+  {
+    "id": "closing",
+    "title": "Necessity Certificate",
+    "caption": "Same prompt. Same app. Provably less data.",
+    "duration": 4,
+    "video_prompt": "A sleek dark navy tech animation: a glowing shield-and-checkmark emblem made of animated circuit-board light lines assembles itself piece by piece in the center of frame, radiating soft light rays outward. Camera slowly pulls back revealing the full emblem. Mint green and light blue accent glow on a near-black background. Clean minimal tech logo animation, no readable text or letters anywhere in frame."
+  }
+]
+
+

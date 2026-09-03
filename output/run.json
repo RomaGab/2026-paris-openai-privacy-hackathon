@@ -1,0 +1,178 @@
+{
+  "config": "demo/demodsl_demo.yaml",
+  "output": "output/necessity_certificate_demodsl.mp4",
+  "engine_version": "3.2.0",
+  "duration": 143.996,
+  "frame": {
+    "width": 1920,
+    "height": 1080
+  },
+  "seed": null,
+  "deterministic": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "navigate",
+      "t": 0.301,
+      "duration": 4.818,
+      "narration_duration": 0.0,
+      "locator": null,
+      "motion": true
+    },
+    {
+      "index": 1,
+      "action": "pause",
+      "t": 5.119,
+      "duration": 18.325,
+      "narration_duration": 17.592,
+      "locator": null,
+      "motion": false
+    },
+    {
+      "index": 2,
+      "action": "camera",
+      "t": 23.444,
+      "duration": 0.686,
+      "narration_duration": 0.0,
+      "locator": null,
+      "motion": true
+    },
+    {
+      "index": 3,
+      "action": "scroll",
+      "t": 24.13,
+      "duration": 4.734,
+      "narration_duration": 0.0,
+      "locator": null,
+      "motion": true
+    },
+    {
+      "index": 4,
+      "action": "pause",
+      "t": 28.865,
+      "duration": 17.685,
+      "narration_duration": 16.968,
+      "locator": null,
+      "motion": false
+    },
+    {
+      "index": 5,
+      "action": "camera",
+      "t": 46.55,
+      "duration": 0.68,
+      "narration_duration": 0.0,
+      "locator": null,
+      "motion": true
+    },
+    {
+      "index": 6,
+      "action": "scroll",
+      "t": 47.23,
+      "duration": 5.839,
+      "narration_duration": 0.0,
+      "locator": null,
+      "motion": true
+    },
+    {
+      "index": 7,
+      "action": "pause",
+      "t": 53.068,
+      "duration": 23.544,
+      "narration_duration": 22.8,
+      "locator": null,
+      "motion": false
+    },
+    {
+      "index": 8,
+      "action": "camera",
+      "t": 76.612,
+      "duration": 0.679,
+      "narration_duration": 0.0,
+      "locator": null,
+      "motion": true
+    },
+    {
+      "index": 9,
+      "action": "scroll",
+      "t": 77.291,
+      "duration": 5.335,
+      "narration_duration": 0.0,
+      "locator": null,
+      "motion": true
+    },
+    {
+      "index": 10,
+      "action": "pause",
+      "t": 82.625,
+      "duration": 17.29,
+      "narration_duration": 16.56,
+      "locator": null,
+      "motion": false
+    },
+    {
+      "index": 11,
+      "action": "camera",
+      "t": 99.915,
+      "duration": 0.689,
+      "narration_duration": 0.0,
+      "locator": null,
+      "motion": true
+    },
+    {
+      "index": 12,
+      "action": "scroll",
+      "t": 100.604,
+      "duration": 5.813,
+      "narration_duration": 0.0,
+      "locator": null,
+      "motion": true
+    },
+    {
+      "index": 13,
+      "action": "pause",
+      "t": 106.417,
+      "duration": 17.038,
+      "narration_duration": 16.296,
+      "locator": null,
+      "motion": false
+    },
+    {
+      "index": 14,
+      "action": "camera",
+      "t": 123.454,
+      "duration": 0.63,
+      "narration_duration": 0.0,
+      "locator": null,
+      "motion": true
+    },
+    {
+      "index": 15,
+      "action": "scroll",
+      "t": 124.084,
+      "duration": 3.828,
+      "narration_duration": 0.0,
+      "locator": null,
+      "motion": true
+    },
+    {
+      "index": 16,
+      "action": "pause",
+      "t": 127.912,
+      "duration": 16.084,
+      "narration_duration": 15.144,
+      "locator": null,
+      "motion": false
+    },
+    {
+      "index": 17,
+      "action": "camera",
+      "t": 143.996,
+      "duration": 0.0,
+      "narration_duration": 0.0,
+      "locator": null,
+      "motion": true
+    }
+  ],
+  "overlays": [],
+  "skipped_steps": []
+}

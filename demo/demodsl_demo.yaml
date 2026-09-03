@@ -1,0 +1,233 @@
+metadata:
+  title: "Necessity Certificate — Privacy by Design for AI"
+  description: "Scroll-through walkthrough of the Necessity Certificate landing page for the 2026 Paris OpenAI Privacy Hackathon."
+  version: "1.0.0"
+
+voice:
+  engine: "gtts"
+  voice_id: "en"
+
+video:
+  intro:
+    duration: 3.0
+    type: fade_in
+    text: "Necessity Certificate"
+    subtitle: "Privacy by design for AI — 2026 Paris OpenAI Privacy Hackathon"
+    font_color: "#37e6a0"
+    background_color: "#0b0f14"
+  outro:
+    duration: 4.0
+    type: fade_out
+    text: "Necessity Certificate"
+    subtitle: "AI that needs less."
+    cta: "github.com/RomaGab/2026-paris-openai-privacy-hackathon"
+  progress_bar:
+    enabled: true
+    accent: "#37e6a0"
+    position: "top"
+  color_correction:
+    contrast: 0.08
+    saturation: 1.08
+    temperature: 5600
+  frame_rate: 30
+  optimization:
+    web_optimized: true
+    compression_level: "high"
+
+scenarios:
+  - name: "Necessity Certificate Walkthrough"
+    url: "http://127.0.0.1:8931/index.html"
+    browser: "chrome"
+    viewport:
+      width: 1920
+      height: 1080
+    steps:
+      - action: navigate
+        url: "http://127.0.0.1:8931/index.html"
+        wait: 0.8
+
+      - action: pause
+        wait: 15.0
+        narration: "AI needs context, not identity. This is the Necessity Certificate: turning a raw customer record into the smallest purpose-specific facts an AI task actually needs, with evidence for every field it leaves behind."
+        camera:
+          target:
+            type: css
+            value: "#hero h1"
+          zoom: 1.15
+          duration: 1.0
+          hold: 3.0
+        effects:
+          - type: fade_in
+            duration: 0.8
+          - type: color_grade
+            preset: "cinematic"
+          - type: vignette
+            intensity: 0.2
+          - type: film_grain
+            intensity: 0.1
+
+      - action: camera
+        camera:
+          reset: true
+          duration: 0.4
+
+      - action: scroll
+        direction: "down"
+        pixels: 1080
+        smooth_scroll: true
+        wait: 0.4
+
+      - action: pause
+        wait: 16.0
+        narration: "Most privacy tooling asks what looks personal, and reacts after data has already reached the AI system. We ask a different question, upfront and by construction: does this declared task actually need this field at all?"
+        camera:
+          target:
+            type: css
+            value: "#problem h2"
+          zoom: 1.1
+          duration: 0.8
+          hold: 3.5
+        effects:
+          - type: color_grade
+            preset: "cinematic"
+          - type: vignette
+            intensity: 0.2
+          - type: film_grain
+            intensity: 0.1
+
+      - action: camera
+        camera:
+          reset: true
+          duration: 0.4
+
+      - action: scroll
+        direction: "down"
+        pixels: 1080
+        smooth_scroll: true
+        wait: 0.4
+
+      - action: pause
+        wait: 19.0
+        narration: "Sixteen synthetic support tickets, one fixed routing model. Each field is removed, one at a time, and the task is rerun. Task-relevant fields like the issue description earn their place. Direct identifiers like name, email, or account ID never do."
+        camera:
+          target:
+            type: css
+            value: "#evidence table"
+          zoom: 1.12
+          duration: 0.9
+          hold: 4.5
+        effects:
+          - type: color_grade
+            preset: "cinematic"
+          - type: vignette
+            intensity: 0.2
+          - type: film_grain
+            intensity: 0.1
+
+      - action: camera
+        camera:
+          reset: true
+          duration: 0.4
+
+      - action: scroll
+        direction: "down"
+        pixels: 1080
+        smooth_scroll: true
+        wait: 0.4
+
+      - action: pause
+        wait: 13.5
+        narration: "That necessity evidence becomes enforced SQL. An AI-facing view exposes only proven columns, fail-closed by default, while blocked personal data stays encrypted at rest and never reaches the model."
+        camera:
+          target:
+            type: css
+            value: "#stepa .grid"
+          zoom: 1.05
+          duration: 0.9
+          hold: 4.0
+        effects:
+          - type: color_grade
+            preset: "cinematic"
+          - type: vignette
+            intensity: 0.2
+          - type: film_grain
+            intensity: 0.1
+
+      - action: camera
+        camera:
+          reset: true
+          duration: 0.4
+
+      - action: scroll
+        direction: "down"
+        pixels: 1080
+        smooth_scroll: true
+        wait: 0.4
+
+      - action: pause
+        wait: 16.0
+        narration: "Does it hold up if a supplier leaks the data? A ten thousand event Monte Carlo simulation shows the probability of a real exposure drops from ninety-nine point seven percent to fifty-eight percent once minimization is applied."
+        camera:
+          target:
+            type: css
+            value: "#stepb .row"
+          zoom: 1.1
+          duration: 0.9
+          hold: 4.5
+        effects:
+          - type: color_grade
+            preset: "cinematic"
+          - type: bloom
+            intensity: 0.3
+          - type: vignette
+            intensity: 0.2
+
+      - action: camera
+        camera:
+          reset: true
+          duration: 0.4
+
+      - action: scroll
+        direction: "down"
+        pixels: 1080
+        smooth_scroll: true
+        wait: 0.4
+
+      - action: pause
+        wait: 14.3
+        narration: "Existing tools find sensitive data. We turn task evidence into an enforced, minimal AI context. Build AI that needs less, and show the evidence for every field it leaves behind."
+        camera:
+          target:
+            type: css
+            value: "#pitch h2"
+          zoom: 1.1
+          duration: 0.9
+          hold: 2.5
+        effects:
+          - type: color_grade
+            preset: "cinematic"
+          - type: confetti
+            duration: 2.0
+
+      - action: camera
+        camera:
+          reset: true
+          duration: 0.6
+        effects:
+          - type: fade_out
+            duration: 1.0
+
+pipeline:
+  - generate_narration: {}
+  - edit_video: {}
+  - mix_audio: {}
+  - optimize:
+      format: "mp4"
+      codec: "h264"
+      quality: "high"
+
+output:
+  filename: "necessity_certificate_demodsl.mp4"
+  directory: "demo/output/"
+  formats:
+    - "mp4"
