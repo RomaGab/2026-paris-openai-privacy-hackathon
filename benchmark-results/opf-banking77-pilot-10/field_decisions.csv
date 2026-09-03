@@ -1,0 +1,11 @@
+field,privacy_cost,decision,decision_changes,improvements,regressions,accuracy_with_field,accuracy_without_field,tokens_saved_if_dropped,review_reason
+issue_description,"task-relevant, not personal",retained_pending_review,10,0,9,0.9,0.0,269,At least one individual decision changed; retain until human review.
+product_area,"task-relevant, not personal",drop_candidate,0,0,0,0.9,0.9,80,No individual decision changed in this single-field ablation.
+urgency,"task-relevant, not personal",drop_candidate,0,0,0,0.9,0.9,50,No individual decision changed in this single-field ablation.
+name,direct identifier,drop_candidate,0,0,0,0.9,0.9,90,No individual decision changed in this single-field ablation.
+email,direct identifier,drop_candidate,0,0,0,0.9,0.9,110,No individual decision changed in this single-field ablation.
+phone,direct identifier,drop_candidate,0,0,0,0.9,0.9,130,No individual decision changed in this single-field ablation.
+date_of_birth,quasi-identifier,drop_candidate,0,0,0,0.9,0.9,130,No individual decision changed in this single-field ablation.
+address,direct identifier,drop_candidate,0,0,0,0.9,0.9,110,No individual decision changed in this single-field ablation.
+account_id,direct identifier,drop_candidate,0,0,0,0.9,0.9,140,No individual decision changed in this single-field ablation.
+support_notes,"task-relevant, not personal",drop_candidate,0,0,0,0.9,0.9,0,No individual decision changed in this single-field ablation.

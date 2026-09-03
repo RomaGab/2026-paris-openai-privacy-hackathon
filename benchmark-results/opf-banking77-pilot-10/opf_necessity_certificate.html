@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy-by-Design Evidence Report</title>
+  <style>
+    :root { color-scheme: dark; --bg:#07111f; --panel:#0f1b2d; --line:#24334a; --text:#e6edf7; --muted:#91a2b8; --violet:#9b87f5; --green:#4ade80; --amber:#fbbf24; --red:#fb7185; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:radial-gradient(circle at 10% 0%,#172554 0,transparent 34%),var(--bg); color:var(--text); font:15px/1.55 Inter,ui-sans-serif,system-ui,sans-serif; }
+    main { width:min(1180px,calc(100% - 40px)); margin:0 auto; padding:56px 0 80px; }
+    header { display:grid; gap:18px; margin-bottom:32px; }
+    .eyebrow { margin:0; color:var(--violet); font-weight:800; letter-spacing:.13em; text-transform:uppercase; font-size:12px; }
+    h1 { margin:0; max-width:930px; font-size:clamp(34px,5vw,64px); line-height:1.02; letter-spacing:-.045em; }
+    h2 { margin:0 0 18px; font-size:24px; letter-spacing:-.02em; }
+    p { color:var(--muted); }
+    .status { width:max-content; border:1px solid; border-radius:999px; padding:7px 12px; font:700 12px ui-monospace,monospace; }
+    .status.review { color:var(--amber); border-color:#854d0e; background:#42200666; }
+    .status.accepted { color:var(--green); border-color:#166534; background:#052e1666; }
+    section { margin-top:24px; padding:26px; border:1px solid var(--line); border-radius:20px; background:linear-gradient(145deg,#111d31dd,#0b1525dd); box-shadow:0 22px 70px #0005; overflow:hidden; }
+    .notice { border-left:3px solid var(--amber); padding-left:14px; color:#d7e0ec; }
+    .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .metric { padding:18px; border:1px solid var(--line); border-radius:14px; background:#0a1423; }
+    .metric span { display:block; color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
+    .metric strong { display:block; margin-top:8px; font-size:29px; }
+    .table-wrap { overflow:auto; }
+    table { width:100%; border-collapse:collapse; white-space:nowrap; }
+    th,td { padding:12px 13px; border-bottom:1px solid var(--line); text-align:right; vertical-align:top; }
+    th:first-child,td:first-child,td:last-child { text-align:left; }
+    thead th { color:var(--muted); font-size:11px; letter-spacing:.06em; text-transform:uppercase; }
+    tbody th { font-weight:700; }
+    .good { color:var(--green); } .bad { color:var(--red); }
+    code { color:#c4b5fd; overflow-wrap:anywhere; }
+    .pill { display:inline-block; padding:3px 8px; border-radius:999px; font:700 11px ui-monospace,monospace; }
+    .pill.drop { color:var(--green); background:#14532d88; }
+    .pill.keep { color:var(--amber); background:#713f1288; }
+    .chart { overflow:auto; padding-top:8px; }
+    .chart svg { width:100%; min-width:760px; height:auto; }
+    .flow { display:grid; grid-template-columns:1fr auto 1fr; gap:16px; align-items:center; }
+    .flow-card { min-height:110px; display:grid; gap:10px; padding:18px; border:1px solid #7f1d1d; border-radius:14px; background:#450a0a44; }
+    .flow-card.safe { border-color:#166534; background:#052e1644; }
+    .flow-card span { color:var(--muted); font-weight:700; text-transform:uppercase; font-size:11px; letter-spacing:.1em; }
+    .arrow { color:var(--violet); font-weight:800; text-align:center; }
+    .flow-note { grid-column:1/-1; margin:0; text-align:center; font-size:12px; }
+    dl { display:grid; grid-template-columns:190px 1fr; gap:7px 18px; }
+    dt { color:var(--muted); } dd { margin:0; min-width:0; }
+    li { color:var(--muted); margin:8px 0; }
+    footer { margin-top:24px; color:var(--muted); font-size:12px; text-align:center; }
+    @media (max-width:800px) { .metrics{grid-template-columns:1fr 1fr}.flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}dl{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">Privacy-by-design evidence</p>
+    <h1>classify a banking support request into the correct intent</h1>
+    <span class="status accepted">accepted_without_review</span>
+    <p class="notice">This report provides measured engineering evidence for review or a DPIA. It is not a legal compliance decision.</p>
+  </header>
+  <div class="metrics"><article class="metric"><span>Baseline accuracy</span><strong>90.0%</strong></article><article class="metric"><span>Combined token reduction</span><strong>40.8%</strong></article><article class="metric"><span>Combined field reduction</span><strong>90.0%</strong></article><article class="metric"><span>OPF detections</span><strong>119</strong></article></div>
+  <section>
+    <h2>Four-condition benchmark</h2>
+    <div class="table-wrap"><table><thead><tr><th>Variant</th><th>Accuracy</th><th>Changes</th><th>Better</th><th>Worse</th><th>Tokens</th><th>Token reduction</th><th>Field reduction</th><th>Residual personal fields</th><th>OPF spans</th></tr></thead><tbody><tr><th>Full context</th><td>90.0%</td><td>0</td><td class="good">0</td><td class="bad">0</td><td>2039</td><td>0.0%</td><td>0.0%</td><td>60</td><td>0</td></tr><tr><th>OPF only</th><td>90.0%</td><td>0</td><td class="good">0</td><td class="bad">0</td><td>2423</td><td>-18.8%</td><td>0.0%</td><td>4</td><td>119</td></tr><tr><th>Minimum context</th><td>90.0%</td><td>0</td><td class="good">0</td><td class="bad">0</td><td>1208</td><td>40.8%</td><td>90.0%</td><td>0</td><td>0</td></tr><tr><th>Minimum + OPF</th><td>90.0%</td><td>0</td><td class="good">0</td><td class="bad">0</td><td>1208</td><td>40.8%</td><td>90.0%</td><td>0</td><td>0</td></tr></tbody></table></div>
+    <div class="chart"><svg xmlns="http://www.w3.org/2000/svg" width="920" height="390" viewBox="0 0 920 390" role="img" aria-label="Accuracy and input token comparison">
+<style>.title{font:700 18px system-ui;fill:#f8fafc}.axis{font:600 12px system-ui;fill:#94a3b8}.label{font:600 13px system-ui;fill:#e2e8f0}.value{font:600 12px ui-monospace,monospace;fill:#cbd5e1}</style>
+<rect width="920" height="390" rx="18" fill="#0f172a"/>
+<text x="20" y="30" class="title">Measured utility and input volume</text>
+<text x="190" y="50" class="axis">Accuracy</text>
+<text x="590" y="50" class="axis">Input tokens</text>
+<text x="20" y="70" class="label">Full context</text>
+<rect x="190" y="52" width="252.0" height="18" rx="5" fill="#8b5cf6"/>
+<text x="480" y="66" class="value">90.0%</text>
+<rect x="590" y="52" width="280.0" height="18" rx="5" fill="#8b5cf6" opacity="0.72"/>
+<text x="880" y="66" text-anchor="end" class="value">2039</text>
+<text x="20" y="152" class="label">OPF only</text>
+<rect x="190" y="134" width="252.0" height="18" rx="5" fill="#3b82f6"/>
+<text x="480" y="148" class="value">90.0%</text>
+<rect x="590" y="134" width="332.73" height="18" rx="5" fill="#3b82f6" opacity="0.72"/>
+<text x="880" y="148" text-anchor="end" class="value">2423</text>
+<text x="20" y="234" class="label">Minimum context</text>
+<rect x="190" y="216" width="252.0" height="18" rx="5" fill="#14b8a6"/>
+<text x="480" y="230" class="value">90.0%</text>
+<rect x="590" y="216" width="165.89" height="18" rx="5" fill="#14b8a6" opacity="0.72"/>
+<text x="880" y="230" text-anchor="end" class="value">1208</text>
+<text x="20" y="316" class="label">Minimum + OPF</text>
+<rect x="190" y="298" width="252.0" height="18" rx="5" fill="#22c55e"/>
+<text x="480" y="312" class="value">90.0%</text>
+<rect x="590" y="298" width="165.89" height="18" rx="5" fill="#22c55e" opacity="0.72"/>
+<text x="880" y="312" text-anchor="end" class="value">1208</text>
+</svg></div>
+  </section>
+  <section><h2>Data boundary</h2><div class="flow"><div class="flow-card"><span>Full context</span><code>issue_description, product_area, urgency, name, email, phone, date_of_birth, address, account_id, support_notes</code></div><div class="arrow">→ OPF + necessity →</div><div class="flow-card safe"><span>Minimum + OPF</span><code>issue_description</code></div><p class="flow-note">Field names only. Raw values are not embedded in this report.</p></div></section>
+  <section>
+    <h2>Field-level evidence</h2>
+    <div class="table-wrap"><table><thead><tr><th>Field</th><th>Privacy cost</th><th>Decision</th><th>Changes</th><th>Better</th><th>Worse</th><th>Accuracy without</th><th>Tokens saved</th><th>Reason</th></tr></thead><tbody><tr><th><code>issue_description</code></th><td>task-relevant, not personal</td><td><span class="pill keep">retained_pending_review</span></td><td>10</td><td>0</td><td>9</td><td>0.0%</td><td>269</td><td>At least one individual decision changed; retain until human review.</td></tr><tr><th><code>product_area</code></th><td>task-relevant, not personal</td><td><span class="pill drop">drop_candidate</span></td><td>0</td><td>0</td><td>0</td><td>90.0%</td><td>80</td><td>No individual decision changed in this single-field ablation.</td></tr><tr><th><code>urgency</code></th><td>task-relevant, not personal</td><td><span class="pill drop">drop_candidate</span></td><td>0</td><td>0</td><td>0</td><td>90.0%</td><td>50</td><td>No individual decision changed in this single-field ablation.</td></tr><tr><th><code>name</code></th><td>direct identifier</td><td><span class="pill drop">drop_candidate</span></td><td>0</td><td>0</td><td>0</td><td>90.0%</td><td>90</td><td>No individual decision changed in this single-field ablation.</td></tr><tr><th><code>email</code></th><td>direct identifier</td><td><span class="pill drop">drop_candidate</span></td><td>0</td><td>0</td><td>0</td><td>90.0%</td><td>110</td><td>No individual decision changed in this single-field ablation.</td></tr><tr><th><code>phone</code></th><td>direct identifier</td><td><span class="pill drop">drop_candidate</span></td><td>0</td><td>0</td><td>0</td><td>90.0%</td><td>130</td><td>No individual decision changed in this single-field ablation.</td></tr><tr><th><code>date_of_birth</code></th><td>quasi-identifier</td><td><span class="pill drop">drop_candidate</span></td><td>0</td><td>0</td><td>0</td><td>90.0%</td><td>130</td><td>No individual decision changed in this single-field ablation.</td></tr><tr><th><code>address</code></th><td>direct identifier</td><td><span class="pill drop">drop_candidate</span></td><td>0</td><td>0</td><td>0</td><td>90.0%</td><td>110</td><td>No individual decision changed in this single-field ablation.</td></tr><tr><th><code>account_id</code></th><td>direct identifier</td><td><span class="pill drop">drop_candidate</span></td><td>0</td><td>0</td><td>0</td><td>90.0%</td><td>140</td><td>No individual decision changed in this single-field ablation.</td></tr><tr><th><code>support_notes</code></th><td>task-relevant, not personal</td><td><span class="pill drop">drop_candidate</span></td><td>0</td><td>0</td><td>0</td><td>90.0%</td><td>0</td><td>No individual decision changed in this single-field ablation.</td></tr></tbody></table></div>
+  </section>
+  <section><h2>OPF and run provenance</h2><dl><dt>Task model</dt><dd><code>gpt-4o-mini</code></dd><dt>Predictor</dt><dd><code>openai:gpt-4o-mini</code></dd><dt>Predictor evidence</dt><dd><code>real_model_run</code></dd><dt>OPF model</dt><dd><code>openai/privacy-filter</code></dd><dt>OPF revision</dt><dd><code>7ffa9a043d54d1be65afb281eddf0ffbe629385b</code></dd><dt>OPF evidence</dt><dd><code>actual_opf_model</code></dd><dt>Corpus SHA-256</dt><dd><code>07d5ffbbc7bf5869f83e65ef651eb6b20f643e436029e198be16516596edc7e5</code></dd><dt>Schema SHA-256</dt><dd><code>c1a1e715a6708de57bac90784b45c298cc071e7d4968314903c1460335434dfb</code></dd><dt>Prompt contract SHA-256</dt><dd><code>d7583a7abed6bd19e1aff0ff3b141ab674683bc076fb637bf50cc29b81f9c3d4</code></dd></dl></section>
+  <section><h2>Limitations</h2><ul><li>This report is empirical evidence for one declared purpose, dataset, prompt contract, model, and run.</li><li>It is not a legal compliance decision or a universal proof that a field never matters.</li><li>Single-field ablation can miss interactions between fields; the minimum-context branch tests their combined removal.</li><li>OPF span counts measure detected entities, not guaranteed removal of every possible identifier.</li><li>Raw record values, prompts, and detected PII text are intentionally omitted from the evidence artifacts.</li></ul></section>
+  <footer>Generated from the same machine-readable report embedded below. Raw record values are omitted.</footer>
+  <script type="application/json" id="report-data">{
+  "report_kind": "privacy_by_design_evidence",
+  "status": "accepted_without_review",
+  "purpose": "classify a banking support request into the correct intent",
+  "table_name": "support_tickets",
+  "run": {
+    "generated_at": "2026-09-03T15:41:48.541909+00:00",
+    "engine": "openai",
+    "predictor": "openai:gpt-4o-mini",
+    "predictor_evidence_level": "real_model_run",
+    "task_model": "gpt-4o-mini",
+    "test_set_size": 10,
+    "corpus_sha256": "07d5ffbbc7bf5869f83e65ef651eb6b20f643e436029e198be16516596edc7e5",
+    "schema_sha256": "c1a1e715a6708de57bac90784b45c298cc071e7d4968314903c1460335434dfb",
+    "prompt_contract_sha256": "d7583a7abed6bd19e1aff0ff3b141ab674683bc076fb637bf50cc29b81f9c3d4"
+  },
+  "opf": {
+    "model_id": "openai/privacy-filter",
+    "requested_revision": "7ffa9a043d54d1be65afb281eddf0ffbe629385b",
+    "resolved_revision": "7ffa9a043d54d1be65afb281eddf0ffbe629385b",
+    "evidence_level": "actual_opf_model",
+    "runtime": {
+      "transformers": "5.16.1",
+      "torch": "2.14.0"
+    },
+    "detected_spans_full_context": 119,
+    "detected_span_categories_full_context": {
+      "account_number": 25,
+      "private_email": 20,
+      "private_phone": 20,
+      "private_date": 20,
+      "private_address": 10,
+      "private_person": 24
+    },
+    "detected_spans_minimum_context": 0,
+    "detected_span_categories_minimum_context": {}
+  },
+  "input_fields": [
+    "issue_description",
+    "product_area",
+    "urgency",
+    "name",
+    "email",
+    "phone",
+    "date_of_birth",
+    "address",
+    "account_id",
+    "support_notes"
+  ],
+  "minimum_fields": [
+    "issue_description"
+  ],
+  "field_evidence": [
+    {
+      "field": "issue_description",
+      "privacy_cost": "task-relevant, not personal",
+      "decision": "retained_pending_review",
+      "decision_changes": 10,
+      "improvements": 0,
+      "regressions": 9,
+      "other_changes": 1,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.0,
+      "tokens_saved_if_dropped": 269,
+      "review_reason": "At least one individual decision changed; retain until human review."
+    },
+    {
+      "field": "product_area",
+      "privacy_cost": "task-relevant, not personal",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 80,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "urgency",
+      "privacy_cost": "task-relevant, not personal",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 50,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "name",
+      "privacy_cost": "direct identifier",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 90,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "email",
+      "privacy_cost": "direct identifier",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 110,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "phone",
+      "privacy_cost": "direct identifier",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 130,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "date_of_birth",
+      "privacy_cost": "quasi-identifier",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 130,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "address",
+      "privacy_cost": "direct identifier",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 110,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "account_id",
+      "privacy_cost": "direct identifier",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 140,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "support_notes",
+      "privacy_cost": "task-relevant, not personal",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 0,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    }
+  ],
+  "benchmark": {
+    "variant_definitions": {
+      "full_context": "All declared input fields, without OPF.",
+      "opf_only": "All declared input fields after actual OPF masking.",
+      "minimum_context": "Only fields retained by the necessity test, without OPF.",
+      "minimum_plus_opf": "Necessity-minimized fields after actual OPF masking."
+    },
+    "variants": {
+      "full_context": {
+        "correct": 9,
+        "total": 10,
+        "accuracy": 0.9,
+        "decision_changes_vs_full": 0,
+        "improvements_vs_full": 0,
+        "regressions_vs_full": 0,
+        "other_changes_vs_full": 0,
+        "decision_stability_vs_full": 1.0,
+        "input_tokens": 2039,
+        "token_sources": [
+          "api_usage"
+        ],
+        "token_reduction_vs_full": 0.0,
+        "field_instances_sent": 100,
+        "field_reduction_vs_full": 0.0,
+        "residual_personal_fields": 60,
+        "residual_personal_field_reduction_vs_full": 0.0,
+        "opf_detected_spans": 0
+      },
+      "opf_only": {
+        "correct": 9,
+        "total": 10,
+        "accuracy": 0.9,
+        "decision_changes_vs_full": 0,
+        "improvements_vs_full": 0,
+        "regressions_vs_full": 0,
+        "other_changes_vs_full": 0,
+        "decision_stability_vs_full": 1.0,
+        "input_tokens": 2423,
+        "token_sources": [
+          "api_usage"
+        ],
+        "token_reduction_vs_full": -0.188328,
+        "field_instances_sent": 100,
+        "field_reduction_vs_full": 0.0,
+        "residual_personal_fields": 4,
+        "residual_personal_field_reduction_vs_full": 0.933333,
+        "opf_detected_spans": 119
+      },
+      "minimum_context": {
+        "correct": 9,
+        "total": 10,
+        "accuracy": 0.9,
+        "decision_changes_vs_full": 0,
+        "improvements_vs_full": 0,
+        "regressions_vs_full": 0,
+        "other_changes_vs_full": 0,
+        "decision_stability_vs_full": 1.0,
+        "input_tokens": 1208,
+        "token_sources": [
+          "api_usage"
+        ],
+        "token_reduction_vs_full": 0.407553,
+        "field_instances_sent": 10,
+        "field_reduction_vs_full": 0.9,
+        "residual_personal_fields": 0,
+        "residual_personal_field_reduction_vs_full": 1.0,
+        "opf_detected_spans": 0
+      },
+      "minimum_plus_opf": {
+        "correct": 9,
+        "total": 10,
+        "accuracy": 0.9,
+        "decision_changes_vs_full": 0,
+        "improvements_vs_full": 0,
+        "regressions_vs_full": 0,
+        "other_changes_vs_full": 0,
+        "decision_stability_vs_full": 1.0,
+        "input_tokens": 1208,
+        "token_sources": [
+          "api_usage"
+        ],
+        "token_reduction_vs_full": 0.407553,
+        "field_instances_sent": 10,
+        "field_reduction_vs_full": 0.9,
+        "residual_personal_fields": 0,
+        "residual_personal_field_reduction_vs_full": 1.0,
+        "opf_detected_spans": 0
+      }
+    }
+  },
+  "field_flow": {
+    "full_context_fields": [
+      "issue_description",
+      "product_area",
+      "urgency",
+      "name",
+      "email",
+      "phone",
+      "date_of_birth",
+      "address",
+      "account_id",
+      "support_notes"
+    ],
+    "minimum_context_fields": [
+      "issue_description"
+    ],
+    "raw_values_embedded": false
+  },
+  "limitations": [
+    "This report is empirical evidence for one declared purpose, dataset, prompt contract, model, and run.",
+    "It is not a legal compliance decision or a universal proof that a field never matters.",
+    "Single-field ablation can miss interactions between fields; the minimum-context branch tests their combined removal.",
+    "OPF span counts measure detected entities, not guaranteed removal of every possible identifier.",
+    "Raw record values, prompts, and detected PII text are intentionally omitted from the evidence artifacts."
+  ]
+}</script>
+</main>
+</body>
+</html>

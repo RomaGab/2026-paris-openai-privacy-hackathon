@@ -1,0 +1,300 @@
+{
+  "report_kind": "privacy_by_design_evidence",
+  "status": "accepted_without_review",
+  "purpose": "classify a banking support request into the correct intent",
+  "table_name": "support_tickets",
+  "run": {
+    "generated_at": "2026-09-03T15:41:48.541909+00:00",
+    "engine": "openai",
+    "predictor": "openai:gpt-4o-mini",
+    "predictor_evidence_level": "real_model_run",
+    "task_model": "gpt-4o-mini",
+    "test_set_size": 10,
+    "corpus_sha256": "07d5ffbbc7bf5869f83e65ef651eb6b20f643e436029e198be16516596edc7e5",
+    "schema_sha256": "c1a1e715a6708de57bac90784b45c298cc071e7d4968314903c1460335434dfb",
+    "prompt_contract_sha256": "d7583a7abed6bd19e1aff0ff3b141ab674683bc076fb637bf50cc29b81f9c3d4"
+  },
+  "opf": {
+    "model_id": "openai/privacy-filter",
+    "requested_revision": "7ffa9a043d54d1be65afb281eddf0ffbe629385b",
+    "resolved_revision": "7ffa9a043d54d1be65afb281eddf0ffbe629385b",
+    "evidence_level": "actual_opf_model",
+    "runtime": {
+      "transformers": "5.16.1",
+      "torch": "2.14.0"
+    },
+    "detected_spans_full_context": 119,
+    "detected_span_categories_full_context": {
+      "account_number": 25,
+      "private_email": 20,
+      "private_phone": 20,
+      "private_date": 20,
+      "private_address": 10,
+      "private_person": 24
+    },
+    "detected_spans_minimum_context": 0,
+    "detected_span_categories_minimum_context": {}
+  },
+  "input_fields": [
+    "issue_description",
+    "product_area",
+    "urgency",
+    "name",
+    "email",
+    "phone",
+    "date_of_birth",
+    "address",
+    "account_id",
+    "support_notes"
+  ],
+  "minimum_fields": [
+    "issue_description"
+  ],
+  "field_evidence": [
+    {
+      "field": "issue_description",
+      "privacy_cost": "task-relevant, not personal",
+      "decision": "retained_pending_review",
+      "decision_changes": 10,
+      "improvements": 0,
+      "regressions": 9,
+      "other_changes": 1,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.0,
+      "tokens_saved_if_dropped": 269,
+      "review_reason": "At least one individual decision changed; retain until human review."
+    },
+    {
+      "field": "product_area",
+      "privacy_cost": "task-relevant, not personal",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 80,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "urgency",
+      "privacy_cost": "task-relevant, not personal",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 50,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "name",
+      "privacy_cost": "direct identifier",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 90,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "email",
+      "privacy_cost": "direct identifier",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 110,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "phone",
+      "privacy_cost": "direct identifier",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 130,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "date_of_birth",
+      "privacy_cost": "quasi-identifier",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 130,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "address",
+      "privacy_cost": "direct identifier",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 110,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "account_id",
+      "privacy_cost": "direct identifier",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 140,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    },
+    {
+      "field": "support_notes",
+      "privacy_cost": "task-relevant, not personal",
+      "decision": "drop_candidate",
+      "decision_changes": 0,
+      "improvements": 0,
+      "regressions": 0,
+      "other_changes": 0,
+      "accuracy_with_field": 0.9,
+      "accuracy_without_field": 0.9,
+      "tokens_saved_if_dropped": 0,
+      "review_reason": "No individual decision changed in this single-field ablation."
+    }
+  ],
+  "benchmark": {
+    "variant_definitions": {
+      "full_context": "All declared input fields, without OPF.",
+      "opf_only": "All declared input fields after actual OPF masking.",
+      "minimum_context": "Only fields retained by the necessity test, without OPF.",
+      "minimum_plus_opf": "Necessity-minimized fields after actual OPF masking."
+    },
+    "variants": {
+      "full_context": {
+        "correct": 9,
+        "total": 10,
+        "accuracy": 0.9,
+        "decision_changes_vs_full": 0,
+        "improvements_vs_full": 0,
+        "regressions_vs_full": 0,
+        "other_changes_vs_full": 0,
+        "decision_stability_vs_full": 1.0,
+        "input_tokens": 2039,
+        "token_sources": [
+          "api_usage"
+        ],
+        "token_reduction_vs_full": 0.0,
+        "field_instances_sent": 100,
+        "field_reduction_vs_full": 0.0,
+        "residual_personal_fields": 60,
+        "residual_personal_field_reduction_vs_full": 0.0,
+        "opf_detected_spans": 0
+      },
+      "opf_only": {
+        "correct": 9,
+        "total": 10,
+        "accuracy": 0.9,
+        "decision_changes_vs_full": 0,
+        "improvements_vs_full": 0,
+        "regressions_vs_full": 0,
+        "other_changes_vs_full": 0,
+        "decision_stability_vs_full": 1.0,
+        "input_tokens": 2423,
+        "token_sources": [
+          "api_usage"
+        ],
+        "token_reduction_vs_full": -0.188328,
+        "field_instances_sent": 100,
+        "field_reduction_vs_full": 0.0,
+        "residual_personal_fields": 4,
+        "residual_personal_field_reduction_vs_full": 0.933333,
+        "opf_detected_spans": 119
+      },
+      "minimum_context": {
+        "correct": 9,
+        "total": 10,
+        "accuracy": 0.9,
+        "decision_changes_vs_full": 0,
+        "improvements_vs_full": 0,
+        "regressions_vs_full": 0,
+        "other_changes_vs_full": 0,
+        "decision_stability_vs_full": 1.0,
+        "input_tokens": 1208,
+        "token_sources": [
+          "api_usage"
+        ],
+        "token_reduction_vs_full": 0.407553,
+        "field_instances_sent": 10,
+        "field_reduction_vs_full": 0.9,
+        "residual_personal_fields": 0,
+        "residual_personal_field_reduction_vs_full": 1.0,
+        "opf_detected_spans": 0
+      },
+      "minimum_plus_opf": {
+        "correct": 9,
+        "total": 10,
+        "accuracy": 0.9,
+        "decision_changes_vs_full": 0,
+        "improvements_vs_full": 0,
+        "regressions_vs_full": 0,
+        "other_changes_vs_full": 0,
+        "decision_stability_vs_full": 1.0,
+        "input_tokens": 1208,
+        "token_sources": [
+          "api_usage"
+        ],
+        "token_reduction_vs_full": 0.407553,
+        "field_instances_sent": 10,
+        "field_reduction_vs_full": 0.9,
+        "residual_personal_fields": 0,
+        "residual_personal_field_reduction_vs_full": 1.0,
+        "opf_detected_spans": 0
+      }
+    }
+  },
+  "field_flow": {
+    "full_context_fields": [
+      "issue_description",
+      "product_area",
+      "urgency",
+      "name",
+      "email",
+      "phone",
+      "date_of_birth",
+      "address",
+      "account_id",
+      "support_notes"
+    ],
+    "minimum_context_fields": [
+      "issue_description"
+    ],
+    "raw_values_embedded": false
+  },
+  "limitations": [
+    "This report is empirical evidence for one declared purpose, dataset, prompt contract, model, and run.",
+    "It is not a legal compliance decision or a universal proof that a field never matters.",
+    "Single-field ablation can miss interactions between fields; the minimum-context branch tests their combined removal.",
+    "OPF span counts measure detected entities, not guaranteed removal of every possible identifier.",
+    "Raw record values, prompts, and detected PII text are intentionally omitted from the evidence artifacts."
+  ]
+}

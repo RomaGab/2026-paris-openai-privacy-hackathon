@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="390" viewBox="0 0 920 390" role="img" aria-label="Accuracy and input token comparison">
+<style>.title{font:700 18px system-ui;fill:#f8fafc}.axis{font:600 12px system-ui;fill:#94a3b8}.label{font:600 13px system-ui;fill:#e2e8f0}.value{font:600 12px ui-monospace,monospace;fill:#cbd5e1}</style>
+<rect width="920" height="390" rx="18" fill="#0f172a"/>
+<text x="20" y="30" class="title">Measured utility and input volume</text>
+<text x="190" y="50" class="axis">Accuracy</text>
+<text x="590" y="50" class="axis">Input tokens</text>
+<text x="20" y="70" class="label">Full context</text>
+<rect x="190" y="52" width="252.0" height="18" rx="5" fill="#8b5cf6"/>
+<text x="480" y="66" class="value">90.0%</text>
+<rect x="590" y="52" width="280.0" height="18" rx="5" fill="#8b5cf6" opacity="0.72"/>
+<text x="880" y="66" text-anchor="end" class="value">2039</text>
+<text x="20" y="152" class="label">OPF only</text>
+<rect x="190" y="134" width="252.0" height="18" rx="5" fill="#3b82f6"/>
+<text x="480" y="148" class="value">90.0%</text>
+<rect x="590" y="134" width="332.73" height="18" rx="5" fill="#3b82f6" opacity="0.72"/>
+<text x="880" y="148" text-anchor="end" class="value">2423</text>
+<text x="20" y="234" class="label">Minimum context</text>
+<rect x="190" y="216" width="252.0" height="18" rx="5" fill="#14b8a6"/>
+<text x="480" y="230" class="value">90.0%</text>
+<rect x="590" y="216" width="165.89" height="18" rx="5" fill="#14b8a6" opacity="0.72"/>
+<text x="880" y="230" text-anchor="end" class="value">1208</text>
+<text x="20" y="316" class="label">Minimum + OPF</text>
+<rect x="190" y="298" width="252.0" height="18" rx="5" fill="#22c55e"/>
+<text x="480" y="312" class="value">90.0%</text>
+<rect x="590" y="298" width="165.89" height="18" rx="5" fill="#22c55e" opacity="0.72"/>
+<text x="880" y="312" text-anchor="end" class="value">1208</text>
+</svg>
