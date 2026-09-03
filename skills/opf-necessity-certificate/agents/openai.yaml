@@ -1,0 +1,4 @@
+interface:
+  display_name: "OPF Necessity Certificate"
+  short_description: "Measure necessity and OPF privacy filtering"
+  default_prompt: "Use $opf-necessity-certificate to benchmark data minimization and OpenAI Privacy Filter for this declared AI task."

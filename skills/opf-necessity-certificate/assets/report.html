@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy-by-Design Evidence Report</title>
+  <style>
+    :root { color-scheme: dark; --bg:#07111f; --panel:#0f1b2d; --line:#24334a; --text:#e6edf7; --muted:#91a2b8; --violet:#9b87f5; --green:#4ade80; --amber:#fbbf24; --red:#fb7185; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:radial-gradient(circle at 10% 0%,#172554 0,transparent 34%),var(--bg); color:var(--text); font:15px/1.55 Inter,ui-sans-serif,system-ui,sans-serif; }
+    main { width:min(1180px,calc(100% - 40px)); margin:0 auto; padding:56px 0 80px; }
+    header { display:grid; gap:18px; margin-bottom:32px; }
+    .eyebrow { margin:0; color:var(--violet); font-weight:800; letter-spacing:.13em; text-transform:uppercase; font-size:12px; }
+    h1 { margin:0; max-width:930px; font-size:clamp(34px,5vw,64px); line-height:1.02; letter-spacing:-.045em; }
+    h2 { margin:0 0 18px; font-size:24px; letter-spacing:-.02em; }
+    p { color:var(--muted); }
+    .status { width:max-content; border:1px solid; border-radius:999px; padding:7px 12px; font:700 12px ui-monospace,monospace; }
+    .status.review { color:var(--amber); border-color:#854d0e; background:#42200666; }
+    .status.accepted { color:var(--green); border-color:#166534; background:#052e1666; }
+    section { margin-top:24px; padding:26px; border:1px solid var(--line); border-radius:20px; background:linear-gradient(145deg,#111d31dd,#0b1525dd); box-shadow:0 22px 70px #0005; overflow:hidden; }
+    .notice { border-left:3px solid var(--amber); padding-left:14px; color:#d7e0ec; }
+    .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .metric { padding:18px; border:1px solid var(--line); border-radius:14px; background:#0a1423; }
+    .metric span { display:block; color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
+    .metric strong { display:block; margin-top:8px; font-size:29px; }
+    .table-wrap { overflow:auto; }
+    table { width:100%; border-collapse:collapse; white-space:nowrap; }
+    th,td { padding:12px 13px; border-bottom:1px solid var(--line); text-align:right; vertical-align:top; }
+    th:first-child,td:first-child,td:last-child { text-align:left; }
+    thead th { color:var(--muted); font-size:11px; letter-spacing:.06em; text-transform:uppercase; }
+    tbody th { font-weight:700; }
+    .good { color:var(--green); } .bad { color:var(--red); }
+    code { color:#c4b5fd; overflow-wrap:anywhere; }
+    .pill { display:inline-block; padding:3px 8px; border-radius:999px; font:700 11px ui-monospace,monospace; }
+    .pill.drop { color:var(--green); background:#14532d88; }
+    .pill.keep { color:var(--amber); background:#713f1288; }
+    .chart { overflow:auto; padding-top:8px; }
+    .chart svg { width:100%; min-width:760px; height:auto; }
+    .flow { display:grid; grid-template-columns:1fr auto 1fr; gap:16px; align-items:center; }
+    .flow-card { min-height:110px; display:grid; gap:10px; padding:18px; border:1px solid #7f1d1d; border-radius:14px; background:#450a0a44; }
+    .flow-card.safe { border-color:#166534; background:#052e1644; }
+    .flow-card span { color:var(--muted); font-weight:700; text-transform:uppercase; font-size:11px; letter-spacing:.1em; }
+    .arrow { color:var(--violet); font-weight:800; text-align:center; }
+    .flow-note { grid-column:1/-1; margin:0; text-align:center; font-size:12px; }
+    dl { display:grid; grid-template-columns:190px 1fr; gap:7px 18px; }
+    dt { color:var(--muted); } dd { margin:0; min-width:0; }
+    li { color:var(--muted); margin:8px 0; }
+    footer { margin-top:24px; color:var(--muted); font-size:12px; text-align:center; }
+    @media (max-width:800px) { .metrics{grid-template-columns:1fr 1fr}.flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}dl{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">Privacy-by-design evidence</p>
+    <h1>{{PURPOSE}}</h1>
+    <span class="status {{STATUS_CLASS}}">{{STATUS}}</span>
+    <p class="notice">This report provides measured engineering evidence for review or a DPIA. It is not a legal compliance decision.</p>
+  </header>
+  <div class="metrics">{{SUMMARY_CARDS}}</div>
+  <section>
+    <h2>Four-condition benchmark</h2>
+    <div class="table-wrap"><table><thead><tr><th>Variant</th><th>Accuracy</th><th>Changes</th><th>Better</th><th>Worse</th><th>Tokens</th><th>Token reduction</th><th>Field reduction</th><th>Residual personal fields</th><th>OPF spans</th></tr></thead><tbody>{{VARIANT_ROWS}}</tbody></table></div>
+    <div class="chart">{{CHART}}</div>
+  </section>
+  <section><h2>Data boundary</h2><div class="flow">{{FIELD_FLOW}}</div></section>
+  <section>
+    <h2>Field-level evidence</h2>
+    <div class="table-wrap"><table><thead><tr><th>Field</th><th>Privacy cost</th><th>Decision</th><th>Changes</th><th>Better</th><th>Worse</th><th>Accuracy without</th><th>Tokens saved</th><th>Reason</th></tr></thead><tbody>{{FIELD_ROWS}}</tbody></table></div>
+  </section>
+  <section><h2>OPF and run provenance</h2><dl>{{METADATA}}</dl></section>
+  <section><h2>Limitations</h2><ul>{{LIMITATIONS}}</ul></section>
+  <footer>Generated from the same machine-readable report embedded below. Raw record values are omitted.</footer>
+  <script type="application/json" id="report-data">{{REPORT_JSON}}</script>
+</main>
+</body>
+</html>
