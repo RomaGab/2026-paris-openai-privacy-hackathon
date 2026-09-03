@@ -127,6 +127,11 @@ def base_table_sql(all_columns: List[str], fields_retained: List[str], fields_bl
             lines.append(f"    -- {col} dropped entirely: no declared purpose (AI or operational) needs it")
         elif col in fields_retained:
             lines.append(f"    {col} TEXT, -- plaintext: task-relevant, not personal")
+    # the last emitted column line must not carry a trailing comma
+    for i in range(len(lines) - 1, -1, -1):
+        if not lines[i].strip().startswith("--"):
+            lines[i] = lines[i].replace(", --", " --", 1) if ", --" in lines[i] else lines[i].rstrip(",")
+            break
     lines.append(");")
     return "\n".join(lines)
 

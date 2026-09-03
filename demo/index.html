@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Necessity Certificate — Privacy by Design for AI Data Minimization</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#121822; --panel2:#0e141c; --ink:#e8edf3; --muted:#8a97a8;
+    --accent:#37e6a0; --accent2:#5aa7ff; --danger:#ff6b6b; --warn:#ffb454; --line:#22303f;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"SF Pro Text",Helvetica,Arial,sans-serif;line-height:1.5;}
+  section{min-height:100vh;padding:6vh 8vw;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid var(--line);}
+  h1{font-size:3.4rem;margin:0 0 .4em;letter-spacing:-.02em;}
+  h2{font-size:2.2rem;margin:0 0 .6em;color:var(--accent);}
+  .kicker{color:var(--accent2);text-transform:uppercase;letter-spacing:.14em;font-size:.85rem;font-weight:600;margin-bottom:1em;}
+  .pitch{font-size:1.5rem;color:var(--muted);max-width:900px;}
+  .pitch b{color:var(--ink);}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:start;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1.6rem 1.8rem;}
+  .card h3{margin-top:0;color:var(--accent2);font-size:1.1rem;}
+  pre{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:1.2rem 1.4rem;overflow:auto;font-size:.92rem;color:#c9e8ff;}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;}
+  .tag{display:inline-block;padding:.15em .7em;border-radius:999px;font-size:.78rem;font-weight:700;letter-spacing:.03em;}
+  .tag.block{background:rgba(255,107,107,.15);color:var(--danger);}
+  .tag.retain{background:rgba(55,230,160,.15);color:var(--accent);}
+  table{border-collapse:collapse;width:100%;margin-top:1rem;}
+  th,td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--line);font-size:.95rem;}
+  th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;}
+  .big{font-size:3rem;font-weight:800;line-height:1;}
+  .big.good{color:var(--accent);}
+  .big.bad{color:var(--danger);}
+  .row{display:flex;gap:2.5rem;flex-wrap:wrap;}
+  .stat{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.6rem;}
+  .stat .label{color:var(--muted);font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;}
+  .arrow{color:var(--muted);font-size:1.6rem;margin:0 .4rem;}
+  .bar-wrap{margin-top:.6rem;background:var(--panel2);border-radius:8px;overflow:hidden;height:14px;}
+  .bar{height:100%;border-radius:8px;}
+  .bar.bad{background:var(--danger);}
+  .bar.good{background:var(--accent);}
+  footer{color:var(--muted);font-size:.9rem;}
+  .cta{display:inline-block;margin-top:1.6rem;background:var(--accent);color:#04150d;font-weight:700;padding:.9rem 1.8rem;border-radius:10px;text-decoration:none;}
+</style>
+</head>
+<body>
+
+<section id="hero">
+  <div class="kicker">2026 Paris OpenAI Privacy Hackathon</div>
+  <h1>Necessity Certificate</h1>
+  <p class="pitch"><b>AI needs context, not identity.</b> We turn a raw customer record into the smallest purpose-specific facts an AI task needs, with evidence for every omission or transformation.</p>
+</section>
+
+<section id="problem">
+  <div class="kicker">The problem</div>
+  <h2>How do we ensure privacy by design, not privacy by reaction?</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Most privacy tooling today</h3>
+      <p>Detects, masks, or redacts personal data <b>after</b> it has already reached the AI system boundary.</p>
+      <p class="pitch" style="font-size:1.05rem">What looks personal?</p>
+    </div>
+    <div class="card" style="border-color:var(--accent)">
+      <h3>What we do instead</h3>
+      <p>Test, upfront and by construction, whether the declared AI task actually <b>needs</b> a given field at all.</p>
+      <p class="pitch" style="font-size:1.05rem;color:var(--ink)">Does this task need this data?</p>
+    </div>
+  </div>
+</section>
+
+<section id="evidence">
+  <div class="kicker">Step 0 — Counterfactual necessity test</div>
+  <h2>Every field earns its place with evidence, not guesswork</h2>
+  <p class="pitch" style="font-size:1.1rem">16 synthetic support tickets, one fixed routing model. Each field is removed, one at a time, and the task is re-run.</p>
+  <table>
+    <tr><th>Field</th><th>Privacy cost</th><th>Accuracy with → without</th><th>Decision</th></tr>
+    <tr><td>issue_description</td><td>task-relevant, not personal</td><td>100% → 56%</td><td><span class="tag retain">RETAIN</span></td></tr>
+    <tr><td>product_area</td><td>task-relevant, not personal</td><td>100% → 62%</td><td><span class="tag retain">RETAIN</span></td></tr>
+    <tr><td>urgency</td><td>task-relevant, not personal</td><td>100% → 100%</td><td><span class="tag block">BLOCK</span></td></tr>
+    <tr><td>name / email / phone</td><td>direct identifier</td><td>100% → 100%</td><td><span class="tag block">BLOCK</span></td></tr>
+    <tr><td>date_of_birth</td><td>quasi-identifier</td><td>100% → 100%</td><td><span class="tag block">BLOCK</span></td></tr>
+    <tr><td>address / account_id</td><td>direct identifier</td><td>100% → 100%</td><td><span class="tag block">BLOCK</span></td></tr>
+  </table>
+</section>
+
+<section id="stepa">
+  <div class="kicker">Step A — Differential-privacy-aware SQL minimization</div>
+  <h2>From necessity evidence to enforced, encrypted SQL</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>AI-facing view — fail-closed by default</h3>
+      <pre><code>CREATE VIEW support_tickets_ai_view AS
+SELECT
+    id,
+    issue_description,
+    product_area
+FROM support_tickets;</code></pre>
+      <p style="color:var(--muted)">Only necessity-proven columns. Untested columns (e.g. <code>support_notes</code>) are blocked too.</p>
+    </div>
+    <div class="card">
+      <h3>Base table — PII encrypted at rest</h3>
+      <pre><code>CREATE TABLE support_tickets_secure (
+    id TEXT PRIMARY KEY,
+    issue_description TEXT,
+    product_area TEXT,
+    name_enc BYTEA,      -- pgp_sym_encrypt
+    email_enc BYTEA,     -- pgp_sym_encrypt
+    account_id_enc BYTEA -- pgp_sym_encrypt
+);</code></pre>
+      <p style="color:var(--muted)">Blocked-but-needed PII never leaves the DB in plaintext, never reaches the model.</p>
+    </div>
+  </div>
+</section>
+
+<section id="stepb">
+  <div class="kicker">Step B — Supplier leakage simulation, 10,000 events</div>
+  <h2>How sure are we this is safe?</h2>
+  <div class="row">
+    <div class="stat">
+      <div class="label">P(≥1 real PII exposure) — independent leaks</div>
+      <div class="row" style="align-items:baseline">
+        <div class="big bad">99.7%</div><div class="arrow">→</div><div class="big good">58%</div>
+      </div>
+      <div class="bar-wrap"><div class="bar bad" style="width:99.7%"></div></div>
+      <div class="bar-wrap"><div class="bar good" style="width:58%"></div></div>
+      <p style="color:var(--muted)">without vs. with Step A minimization</p>
+    </div>
+    <div class="stat">
+      <div class="label">Expected exposed events — correlated breach</div>
+      <div class="row" style="align-items:baseline">
+        <div class="big bad">140</div><div class="arrow">→</div><div class="big good">37</div>
+      </div>
+      <div class="bar-wrap"><div class="bar bad" style="width:100%"></div></div>
+      <div class="bar-wrap"><div class="bar good" style="width:27%"></div></div>
+      <p style="color:var(--muted)">out of 10,000 events, per batch</p>
+    </div>
+  </div>
+  <p class="pitch" style="font-size:1.05rem;margin-top:2rem">Monte Carlo across 2,000 repetitions, two threat models. The residual risk that remains either way: free text can still carry incidental PII — minimization cuts volume, not that one irreducible channel.</p>
+</section>
+
+<section id="pitch">
+  <div class="kicker">Pitch</div>
+  <h2>Existing tools find sensitive data.<br>We turn task evidence into an enforced minimal AI context.</h2>
+  <p class="pitch">Build AI that needs less, and show the evidence for every field it leaves behind.</p>
+  <a class="cta" href="https://github.com/RomaGab/2026-paris-openai-privacy-hackathon">View the source →</a>
+  <footer style="margin-top:3rem">github.com/RomaGab/2026-paris-openai-privacy-hackathon</footer>
+</section>
+
+</body>
+</html>
