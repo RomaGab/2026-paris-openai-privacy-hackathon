@@ -2,7 +2,7 @@
 
 ## One-line pitch
 
-**We do not just remove data before an AI call. We make every removed field carry its own evidence of why the declared task did not need it.**
+**AI needs context, not identity. We turn a raw customer record into the smallest purpose-specific facts an AI task needs, with evidence for every omission or transformation.**
 
 ## Problem
 
@@ -12,40 +12,42 @@ Privacy by design means minimizing data use before processing, not filtering it 
 
 Most privacy tooling answers an important but different question: **what looks personal?** It detects, masks, pseudonymises, or redacts personal data after collection, once it has already reached the system boundary. This is privacy by reaction, not privacy by design.
 
-The question we need to answer instead, upfront and by construction, is: **does this specific AI task need this field at all?**
+The question we need to answer instead, upfront and by construction, is: **what is the smallest context this specific AI task needs?**
 
 ## Solution
 
-For a declared purpose, such as routing a support ticket, the system tests every input field counterfactually:
+For a declared purpose, such as taking the next support action, the system produces a purpose-specific minimum context:
 
-1. Run the task with the complete record.
-2. Remove one field and run the identical task again.
-3. Measure whether the expected decision changes on a declared test set.
-4. Block fields whose removal does not degrade the measured task outcome.
-5. Generate an auditable evidence card for every retained or removed field.
+1. Declare the request type and the expected outcome.
+2. Run the task with the complete record.
+3. Remove, generalise, or derive one input at a time and rerun the identical task.
+4. Measure whether an expected decision changes on a declared test set.
+5. Review the resulting allowlist of facts, then enforce it before the model call.
+6. Generate an auditable evidence card for every retained, transformed, or blocked input.
 
-The result is a Necessity Certificate: a system that does not merely say, "we removed email," but attaches the observed evidence for doing so.
+The result is a Necessity Certificate: a system that does not merely say, "we removed an account ID," but records why the task received `plan = Pro` instead.
 
 ## Evidence card
 
 ```text
-Field: email
-Declared purpose: route a support ticket
+Source field: account_id
+Declared purpose: prioritise a billing request
 Privacy cost: direct identifier
-Counterfactual test: removed in [N] declared synthetic cases
-Observed effect: [K] routing decisions changed
-Operational action: block before the model call
+Minimal context sent: subscription_plan = Pro
+Counterfactual test: raw ID replaced in [N] declared synthetic cases
+Observed effect: [K] expected decisions changed
+Operational action: derive the plan locally; block the raw ID before the model call
 ```
 
 ## How it differs from PII filtering
 
 | PII filtering | Necessity Certificate |
 |---|---|
-| What data is personal? | Is this data necessary for the declared task? |
-| Detect or mask data | Test necessity and block unnecessary data before the model call |
+| What data is personal? | What minimal context is necessary for this declared task? |
+| Detect or mask data | Test, generalise, derive, or block data before the model call |
 | A detection result | A reproducible minimization certificate |
 
-These approaches are complementary. A PII detector can help identify a field's privacy cost. This project determines whether that field should cross the AI boundary at all.
+These approaches are complementary. A PII detector can identify a field's privacy cost, especially in free text. This project determines whether a raw field should cross the AI boundary at all, or whether a less identifying fact is sufficient.
 
 ## What we can prove
 
@@ -55,22 +57,26 @@ These approaches are complementary. A PII detector can help identify a field's p
 
 ## Minimum viable demo
 
-- **Purpose**: route a synthetic support ticket to an appropriate queue.
-- **Fields**: issue description, product area, urgency, name, email, phone, date of birth, address, account ID.
+- **Purpose**: choose the next action for a synthetic B2B SaaS support request.
+- **Request types**: billing dispute, delayed delivery, account-access issue.
+- **Minimum context**: a billing request can receive `subscription_plan` and `invoice_status`; delivery can receive `delivery_status` and a country or region; account access can receive `failed_login_count` and `last_login_age`.
+- **Raw inputs held back**: name, email, phone, date of birth, street address, and account ID. The raw ID may be used locally to derive an approved fact, but is never sent to the model.
 - **Baseline**: run each complete record with one fixed prompt and model configuration.
-- **Ablation**: remove one field at a time and repeat the same run.
-- **Measures**: exact match against the expected queue and input tokens sent.
-- **Output**: a before/after payload and evidence cards showing fields blocked or retained.
+- **Ablation and transformation**: remove or replace one input at a time and repeat the same run.
+- **Measures**: exact match against the expected action, raw personal fields withheld, and input tokens sent.
+- **Output**: a before/after payload and Necessity Certificates showing inputs retained, transformed, or blocked.
 
 All displayed measurements are real and reproducible. The demonstration data is synthetic.
 
 ## Proof of concept
 
-The `poc/` folder implements the minimum viable demo above end to end:
+The `poc/` folder currently implements the first measurement harness, using synthetic ticket routing:
 
 - `poc/data/synthetic_tickets.json` — 16 synthetic support tickets with the declared fields and an expected queue.
 - `poc/classifier.py` — the routing task. Uses the OpenAI API when `OPENAI_API_KEY` is set, otherwise falls back to a deterministic offline classifier so the demo runs with no key.
 - `poc/minimize.py` — runs the baseline, ablates each field one at a time, measures exact-match accuracy and tokens sent, and prints/saves an evidence card per field.
+
+The next iteration replaces the simple raw-field removal scenario with the contextual use case above: purpose-specific facts are derived locally, reviewed, and enforced as the model payload.
 
 Run it:
 
@@ -87,6 +93,6 @@ The project builds on established detection, governance, policy, and evaluation 
 
 ## Pitch
 
-> Existing tools find sensitive data. We turn task evidence into an enforced minimal AI payload.
+> Existing tools find sensitive data. We turn task evidence into an enforced minimal AI context.
 
 > Build AI that needs less, and show the evidence for every field it leaves behind.

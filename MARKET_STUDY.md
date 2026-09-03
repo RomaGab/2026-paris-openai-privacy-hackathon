@@ -9,12 +9,12 @@ The component technologies already exist. The defensible contribution of **Neces
 ```text
 declared purpose
 → counterfactual task measurement
-→ reviewed field allowlist
-→ enforced minimal payload
+→ reviewed context contract
+→ enforced minimal payload of facts
 → reproducible evidence certificate
 ```
 
-We should not claim to have invented data minimization, PII detection, policy engines, feature ablation, or formal proof. We can claim a concrete and testable way to turn task evidence into an enforced minimum payload for an AI call.
+We should not claim to have invented data minimization, PII detection, policy engines, feature ablation, or formal proof. We can claim a concrete and testable way to turn task evidence into an enforced minimum payload of purpose-specific facts for an AI call.
 
 ## Existing solutions
 
@@ -32,12 +32,12 @@ The original product proposition is not any individual box in the diagram. It is
 1. A person declares a purpose and its expected output.
 2. The system measures which fields affect that output on a declared corpus.
 3. A reviewer accepts the resulting field allowlist.
-4. A gateway ensures the model receives only that allowlist.
+4. A gateway ensures the model receives only that context contract, including derived or generalised facts where appropriate.
 5. The product emits the evidence, configuration, and payload summary needed to reproduce the decision.
 
 This produces a useful distinction:
 
-> Existing tools find sensitive data. Necessity Certificate turns task evidence into an enforced minimal AI payload.
+> Existing tools find sensitive data. Necessity Certificate turns task evidence into an enforced minimal AI context.
 
 The certificate is useful because it links a removal decision to a purpose, a test design, actual observed results, and the operational control that acted on the decision.
 
@@ -75,13 +75,13 @@ If a comparable product already has a governance dashboard:
 
 ## Demonstration implication
 
-The demo should show a single use case end to end. A synthetic support-routing task is sufficient:
+The demo should show a single use case end to end. A synthetic B2B SaaS support-action task is sufficient:
 
-1. Show the full record and the declared routing purpose.
+1. Show the full record and the declared next-action purpose.
 2. Run the baseline.
-3. Remove fields, one at a time, and measure the expected routing result.
-4. Review the recommended allowlist.
-5. Show the gateway forwarding only the approved minimal payload.
+3. Remove, generalise, or derive fields one at a time, and measure the expected action.
+4. Review the recommended context contract, including any locally derived fact.
+5. Show the gateway forwarding only the approved minimal payload of facts.
 6. Open the resulting Necessity Certificate.
 
 Every displayed number must come from the run shown or an explicitly identified prior run. The synthetic nature of the dataset and the limits of the result must be stated clearly.
