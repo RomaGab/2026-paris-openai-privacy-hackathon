@@ -420,7 +420,7 @@
     <main class="page">
       <header class="intro">
         <h1>AI needs context, not identity.</h1>
-        <p class="task">Task · <strong>Route a support ticket</strong></p>
+        <p class="task">Task · <strong id="taskLabel">Route a support ticket</strong></p>
       </header>
 
       <section class="outcomes" aria-label="Key results">
@@ -430,7 +430,7 @@
         </div>
         <div class="outcome">
           <strong id="accuracyMetric">100%</strong>
-          <span>routing accuracy preserved</span>
+          <span>baseline task accuracy</span>
         </div>
         <div class="outcome">
           <strong id="piiMetric">0</strong>
@@ -467,7 +467,7 @@
           <span class="result-icon" aria-hidden="true">✓</span>
           <span id="resultText">7 fields blocked before the model call</span>
         </div>
-        <span class="result-note">The routing decision stays unchanged.</span>
+        <span class="result-note">The measured decision stays unchanged.</span>
       </div>
 
       <button class="evidence-toggle" id="evidenceToggle" type="button" aria-expanded="false" aria-controls="evidenceDetails">
@@ -528,6 +528,7 @@
 
     <script type="application/json" id="fallback-report">
       {
+        "purpose": "route a support ticket",
         "engine": "offline_rule_based",
         "test_set_size": 16,
         "baseline_accuracy": 1,
@@ -554,7 +555,7 @@
 
     <script>
       let report = JSON.parse(document.getElementById('fallback-report').textContent);
-      let selectedField = report.evidence_cards[0].field;
+      let selectedField = report.evidence_cards[0]?.field || '';
 
       const escapeHtml = value => String(value)
         .replaceAll('&', '&amp;')
@@ -590,7 +591,9 @@
         const total = report.evidence_cards.length;
         const retained = report.fields_retained.length;
         const exposedIdentifiers = report.evidence_cards.filter(card => isRetained(card.field) && card.privacy_cost.includes('identifier')).length;
+        const purpose = report.purpose || report.evidence_cards[0]?.declared_purpose || 'AI task';
 
+        document.getElementById('taskLabel').textContent = purpose.replace(/^\w/, letter => letter.toUpperCase());
         document.getElementById('reductionMetric').textContent = `${total} → ${retained}`;
         document.getElementById('accuracyMetric').textContent = `${Math.round(report.baseline_accuracy * 100)}%`;
         document.getElementById('piiMetric').textContent = exposedIdentifiers;
@@ -660,14 +663,16 @@
 
       render();
 
-      fetch('./report.json', { cache: 'no-store' })
-        .then(response => response.ok ? response.json() : Promise.reject())
-        .then(latestReport => {
-          report = latestReport;
-          selectedField = report.evidence_cards[0]?.field || '';
-          render();
-        })
-        .catch(() => {});
+      if (!report._standalone) {
+        fetch('./report.json', { cache: 'no-store' })
+          .then(response => response.ok ? response.json() : Promise.reject())
+          .then(latestReport => {
+            report = latestReport;
+            selectedField = report.evidence_cards[0]?.field || '';
+            render();
+          })
+          .catch(() => {});
+      }
     </script>
   </body>
 </html>

@@ -21,6 +21,8 @@ JSON dataset, this script:
   6. Emits a minimized AI-facing SQL view (only columns proven necessary
      AND already safe to expose) and a secure base-table DDL (blocked-but-
      operationally-needed PII columns encrypted/generalized, never plain).
+  7. Emits a self-contained HTML certificate for immediate inspection in
+     Codex, populated from the same report as the JSON and Markdown outputs.
 
 Usage:
     python necessity_certificate.py \\
@@ -445,6 +447,30 @@ def render_markdown(report: Dict, audit: List[Dict]) -> str:
     return "\n".join(lines)
 
 
+def render_html(report: Dict, template_path: Path) -> str:
+    """Embed a report in the Codex-style HTML template as standalone JSON."""
+    html = template_path.read_text(encoding="utf-8")
+    marker = re.compile(
+        r'(<script type="application/json" id="fallback-report">\s*)(.*?)(\s*</script>)',
+        re.DOTALL,
+    )
+    if not marker.search(html):
+        raise ValueError(f"HTML template has no fallback-report data block: {template_path}")
+
+    embedded_report = dict(report)
+    embedded_report["_standalone"] = True
+    # HTML parsers close script elements even when the closing tag occurs in
+    # JSON text. Escaping every JSON solidus after '<' keeps values inert while
+    # remaining valid JSON for JSON.parse().
+    payload_json = json.dumps(embedded_report, indent=2, ensure_ascii=False).replace("</", "<\\/")
+    return marker.sub(lambda match: f"{match.group(1)}{payload_json}{match.group(3)}", html, count=1)
+
+
+def default_html_template_path() -> Path:
+    """Return the repository's canonical report template."""
+    return Path(__file__).resolve().parents[3] / "poc" / "report.html"
+
+
 # ---------------------------------------------------------------------------
 # main
 # ---------------------------------------------------------------------------
@@ -465,6 +491,8 @@ def main() -> None:
                               "if blocked from the AI view.")
     parser.add_argument("--model", default="gpt-4o-mini")
     parser.add_argument("--out-dir", default="out")
+    parser.add_argument("--html-template", default=None,
+                        help="Optional path to the Codex-style HTML template. Defaults to poc/report.html.")
     args = parser.parse_args()
 
     ddl = Path(args.schema).read_text(encoding="utf-8")
@@ -509,11 +537,16 @@ def main() -> None:
 
     (out_dir / "necessity_certificate.md").write_text(render_markdown(report, audit), encoding="utf-8")
 
+    html_template = Path(args.html_template) if args.html_template else default_html_template_path()
+    html_path = out_dir / "necessity_certificate.html"
+    html_path.write_text(render_html(report, html_template), encoding="utf-8")
+
     print("=" * 60)
     print(f"Fields blocked before the model call: {report['fields_blocked']}")
     print(f"Fields retained (required for task outcome): {report['fields_retained']}")
     print(f"Artifacts written to {out_dir}/ "
-          f"(evidence_cards.json, minimized_schema.sql, necessity_certificate.md)")
+          f"(evidence_cards.json, minimized_schema.sql, necessity_certificate.md, necessity_certificate.html)")
+    print(f"Open the visual certificate in Codex: {html_path.resolve()}")
 
 
 if __name__ == "__main__":
