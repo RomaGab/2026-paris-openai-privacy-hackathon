@@ -8,7 +8,7 @@
 
 **How do we ensure privacy by design in AI systems, rather than bolt it on after the fact?**
 
-Privacy by design means minimizing data use before processing, not filtering it afterwards. In practice, most AI systems fail this test: they are commonly given whole records — a support ticket, application, or customer profile — that can contain direct identifiers and sensitive context irrelevant to the requested decision.
+Privacy by design means minimizing data use before processing, not filtering it afterwards. In practice, most AI systems fail this test: they are commonly given whole records, such as a support ticket, application, or customer profile, that can contain direct identifiers and sensitive context irrelevant to the requested decision.
 
 Most privacy tooling answers an important but different question: **what looks personal?** It detects, masks, pseudonymises, or redacts personal data after collection, once it has already reached the system boundary. This is privacy by reaction, not privacy by design.
 
@@ -72,9 +72,9 @@ All displayed measurements are real and reproducible. The demonstration data is 
 
 The `poc/` folder currently implements the first measurement harness, using synthetic ticket routing:
 
-- `poc/data/synthetic_tickets.json` — 16 synthetic support tickets with the declared fields and an expected queue.
-- `poc/classifier.py` — the routing task. Uses the OpenAI API when `OPENAI_API_KEY` is set, otherwise falls back to a deterministic offline classifier so the demo runs with no key.
-- `poc/minimize.py` — runs the baseline, ablates each field one at a time, measures exact-match accuracy and tokens sent, and prints/saves an evidence card per field.
+- `poc/data/synthetic_tickets.json`: 16 synthetic support tickets with the declared fields and an expected queue.
+- `poc/classifier.py`: the routing task. Uses the OpenAI API when `OPENAI_API_KEY` is set, otherwise falls back to a deterministic offline classifier so the demo runs with no key.
+- `poc/minimize.py`: runs the baseline, ablates each field one at a time, measures exact-match accuracy and tokens sent, and prints/saves an evidence card per field.
 
 The next iteration replaces the simple raw-field removal scenario with the contextual use case above: purpose-specific facts are derived locally, reviewed, and enforced as the model payload.
 
@@ -115,6 +115,10 @@ The project builds on established detection, governance, policy, and evaluation 
 ## Product plan and principles
 
 [PRODUCT_PLAN.md](PRODUCT_PLAN.md) defines the two user journeys, Privacy Preflight principles, wizard screens, structured skill contract, benchmark requirements, report contents, and the scope gate for the minimum viable submission.
+
+## Critical review
+
+[REVIEW_FEEDBACK.md](REVIEW_FEEDBACK.md) records the P0 correctness gaps, claim boundaries, validation criteria, and final scope gate.
 
 ## Pitch
 
