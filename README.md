@@ -110,7 +110,9 @@ python poc/leakage_simulation.py --events 10000 --threshold 0.01
 
 ### Storyboard video
 
-`demo/generate_video.py` turns a 7-scene storyboard (`demo/storyboard.json`) of the Step A minimization story into a real generated video, not a slideshow: each scene is a genuine animated clip from OpenRouter's direct video generation API (`minimax/hailuo-3-max` by default), captioned and crossfaded into `demo/storyboard_video.mp4`. Falls back to an offline Ken Burns still-card per scene if `OPENROUTER_API_KEY` is unset or a scene's generation call fails.
+`demo/generate_video.py` turns a 7-scene storyboard (`demo/storyboard.json`) into a real generated video, not a slideshow: each scene is a genuine animated clip from OpenRouter's direct video generation API (`minimax/hailuo-3-max` by default), captioned and crossfaded into `demo/storyboard_video.mp4`. Falls back to an offline Ken Burns still-card per scene if `OPENROUTER_API_KEY` is unset or a scene's generation call fails.
+
+The current storyboard tells the product story end to end: a developer prompts Codex to build a website, Codex generates a working app backed by a database full of raw PII, the Necessity Certificate skill (`skills/necessity-certificate/`) is attached, Codex reruns the same task, and the rebuilt app ships with a minimized, evidence-backed database. The earlier, more abstract "Step A minimization" storyboard is kept at `demo/storyboard_db_minimization.json` for reference.
 
 ```bash
 export OPENROUTER_API_KEY=sk-or-...   # optional, else offline fallback clips

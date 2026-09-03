@@ -1,0 +1,51 @@
+[
+  {
+    "id": "raw_record",
+    "title": "The problem",
+    "caption": "AI tasks are usually handed the whole record.",
+    "duration": 4,
+    "video_prompt": "A sleek dark navy tech animation: a database table row lights up with glowing icons for a person, an envelope, a phone, a calendar, a house, and an ID card, all connected by animated light-trail arrows that stream directly into a pulsing glowing AI neural network chip in the center. Particles of light travel along the arrows. Camera slowly pushes in. Mint green and light blue accent glow on a near-black background. Minimal flat geometric design, no readable text or letters anywhere in frame."
+  },
+  {
+    "id": "necessity_test",
+    "title": "Ask: does the task need it?",
+    "caption": "Remove one field, rerun the task, measure the difference.",
+    "duration": 4,
+    "video_prompt": "A sleek dark navy tech animation: a row of small glowing icon tiles moves along a conveyor belt, a glowing robotic arm reaches down and lifts one tile away while a magnifying glass sweeps across the remaining tiles. A green checkmark glyph and a red X glyph pulse alternately above the belt. Camera slowly pans right. Mint green accent glow on a near-black background. Minimal flat geometric design, no readable text or letters anywhere in frame."
+  },
+  {
+    "id": "evidence_card",
+    "title": "Evidence, not guesswork",
+    "caption": "Every field gets an evidence card: block or retain.",
+    "duration": 4,
+    "video_prompt": "A sleek dark navy tech animation: a glowing certificate-shaped panel rotates gently in space, a green checkmark seal and a red stop icon pulse on its corners, a small bar chart animates growing beside it, a padlock icon flips from open to closed. Camera orbits slowly around the panel. Mint green and red accent glow on a near-black background. Minimal flat geometric design, no readable text or letters anywhere in frame."
+  },
+  {
+    "id": "ai_view",
+    "title": "Minimized SQL view",
+    "caption": "The AI only ever sees a minimized, fail-closed SQL view.",
+    "duration": 4,
+    "video_prompt": "A sleek dark navy tech animation: a narrow glowing funnel shaped like a simple two-cell grid channels a stream of light particles into a pulsing AI chip icon, while behind a translucent glass wall a much larger grid of table-column icons dims and fades away. Camera slowly pushes in on the funnel. Mint green accent glow on a near-black background. Minimal flat geometric design, no readable text or letters anywhere in frame."
+  },
+  {
+    "id": "encrypted_at_rest",
+    "title": "Encrypted at rest",
+    "caption": "Everything else stays in the database, encrypted, never in plaintext.",
+    "duration": 4,
+    "video_prompt": "A sleek dark navy tech animation: a large bank vault door slowly swings shut with a glowing padlock sealing it, behind it stacked database cylinder icons pulse softly, scrambled binary ciphertext glyphs float and dissolve near the vault door. Camera slowly pulls back to reveal the full vault. Light blue and mint green accent glow on a near-black background. Minimal flat geometric design, no readable text or letters anywhere in frame."
+  },
+  {
+    "id": "leakage_sim",
+    "title": "Proven safe, at scale",
+    "caption": "10,000 simulated supplier events: real exposure risk cut sharply.",
+    "duration": 4,
+    "video_prompt": "A sleek dark navy tech animation: thousands of tiny light particles stream from three small factory-building icons through a glowing shield into a descending bar chart that shrinks as particles pass through the shield, the shield glows brighter mint green as the chart shrinks. Camera slowly pushes in on the shield. Minimal flat geometric design on a near-black background, no readable text or letters anywhere in frame."
+  },
+  {
+    "id": "closing",
+    "title": "Necessity Certificate",
+    "caption": "Build AI that needs less. Prove it.",
+    "duration": 4,
+    "video_prompt": "A sleek dark navy tech animation: a glowing shield-and-checkmark emblem made of animated circuit-board light lines assembles itself piece by piece in the center of frame, radiating soft light rays outward. Camera slowly pulls back revealing the full emblem. Mint green and light blue accent glow on a near-black background. Clean minimal tech logo animation, no readable text or letters anywhere in frame."
+  }
+]

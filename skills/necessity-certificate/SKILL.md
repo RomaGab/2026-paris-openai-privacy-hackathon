@@ -105,6 +105,20 @@ Outputs, written to `--out-dir`:
 - `necessity_certificate.md` — human-readable evidence cards + column disposition table + limits section, ready
   to hand to a reviewer or attach to a DPIA.
 
+### Remote MCP server
+
+The same pipeline is also deployed as a Cloudflare Workers MCP server at
+`https://necessity-certificate-mcp.amat-francois.workers.dev/mcp` (source in `../../mcp/`), exposing two tools:
+
+- `classify_columns(schema_sql, privacy_cost_overrides?)` — quick privacy-cost classification per column.
+- `necessity_certificate(purpose, schema_sql, records, label_field, label_values?, privacy_cost_overrides?, secondary_retention?, model?)`
+  — the full pipeline above, returning the markdown certificate, the minimized SQL, and the JSON report.
+
+Add it to any MCP client (Claude Desktop, VS Code, the AI Playground, `mcp-remote`) by pointing at that URL; no
+authentication is configured (demo deployment). Set the `OPENAI_API_KEY` secret on the Worker
+(`wrangler secret put OPENAI_API_KEY` from `mcp/`) to get real evidence instead of the offline dry run; the demo
+deployment caps input at 25 records per call.
+
 ### Try it on the existing demo data
 
 The repo already ships a labeled dataset you can run this against immediately:

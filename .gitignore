@@ -6,3 +6,5 @@ poc/step_a_output.sql
 poc/leakage_report.json
 demo/storyboard_frames/
 demo/storyboard_clips/
+node_modules/
+.wrangler/
