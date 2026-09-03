@@ -24,12 +24,20 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Protocol
 
-from classifier import FIELDS, _build_prompt, classify_measured
+from banking77_corpus import (
+    BANKING77_INTENTS,
+    BANKING77_LICENSE,
+    BANKING77_SOURCE_URL,
+)
+from classifier import FIELDS, QUEUES, _build_prompt, classify_measured
 
 
 DATA_PATH = Path(__file__).parent / "data" / "synthetic_tickets.json"
+BANKING77_DATA_PATH = Path(__file__).parent / "data" / "banking77_test_subset.json"
 DEFAULT_JSON_PATH = Path(__file__).parent / "benchmark-report.json"
 DEFAULT_MARKDOWN_PATH = Path(__file__).parent / "benchmark-report.md"
+BANKING77_JSON_PATH = Path(__file__).parent / "banking77-benchmark-report.json"
+BANKING77_MARKDOWN_PATH = Path(__file__).parent / "banking77-benchmark-report.md"
 
 MINIMUM_FIELDS = ("issue_description", "product_area", "urgency")
 STRUCTURED_PII_FIELDS = {
@@ -46,6 +54,75 @@ VARIANT_NAMES = (
     "minimum_context",
     "minimum_plus_masking",
 )
+
+
+@dataclass(frozen=True)
+class CorpusProfile:
+    name: str
+    data_path: Path
+    labels: tuple[str, ...]
+    minimum_fields: tuple[str, ...]
+    task_name: str
+    description: str
+    public_source_data: bool
+    synthetic_identity_overlay: bool
+    fully_synthetic: bool
+    source_url: str
+    license: str
+    limitations: tuple[str, ...]
+
+
+CORPUS_PROFILES = {
+    "synthetic": CorpusProfile(
+        name="synthetic",
+        data_path=DATA_PATH,
+        labels=tuple(QUEUES),
+        minimum_fields=tuple(MINIMUM_FIELDS),
+        task_name="support ticket router",
+        description="16 synthetic support-ticket routing cases",
+        public_source_data=False,
+        synthetic_identity_overlay=False,
+        fully_synthetic=True,
+        source_url="",
+        license="",
+        limitations=(
+            "The corpus is small, synthetic, and specific to support-ticket routing.",
+            "The same engineering corpus was used to design and evaluate the allowlist; there is no independent holdout set yet.",
+        ),
+    ),
+    "banking77": CorpusProfile(
+        name="banking77",
+        data_path=BANKING77_DATA_PATH,
+        labels=tuple(BANKING77_INTENTS),
+        minimum_fields=("issue_description",),
+        task_name="banking support intent classifier",
+        description="Fixed 50-case subset of the public BANKING77 test split",
+        public_source_data=True,
+        synthetic_identity_overlay=True,
+        fully_synthetic=False,
+        source_url=BANKING77_SOURCE_URL,
+        license=BANKING77_LICENSE,
+        limitations=(
+            "This is a fixed 50-case, 10-intent BANKING77-derived subset evaluation, not a full BANKING77 benchmark result.",
+            "The support queries and intent labels come from BANKING77; all structured identity fields are synthetic overlays.",
+            "The minimum-context allowlist was designed before this public holdout evaluation.",
+            "BANKING77 is public, so possible model pretraining exposure is unknown; this run measures relative context effects, not uncontaminated generalization.",
+        ),
+    ),
+}
+
+
+def get_corpus_profile(name: str) -> CorpusProfile:
+    try:
+        return CORPUS_PROFILES[name]
+    except KeyError as exc:
+        raise ValueError(f"Unknown corpus profile: {name}") from exc
+
+
+def get_default_report_paths(corpus_name: str) -> tuple[Path, Path]:
+    if corpus_name == "banking77":
+        return BANKING77_JSON_PATH, BANKING77_MARKDOWN_PATH
+    return DEFAULT_JSON_PATH, DEFAULT_MARKDOWN_PATH
 
 
 @dataclass(frozen=True)
@@ -130,16 +207,20 @@ def full_payload(ticket: Mapping[str, str]) -> Dict[str, str]:
     return {field: ticket[field] for field in FIELDS if field in ticket}
 
 
-def minimum_payload(ticket: Mapping[str, str]) -> Dict[str, str]:
-    return {field: ticket[field] for field in MINIMUM_FIELDS if field in ticket}
+def minimum_payload(
+    ticket: Mapping[str, str],
+    minimum_fields: Iterable[str] = MINIMUM_FIELDS,
+) -> Dict[str, str]:
+    return {field: ticket[field] for field in minimum_fields if field in ticket}
 
 
 def build_variant_payloads(
     ticket: Mapping[str, str],
     masker: RecordMasker,
+    minimum_fields: Iterable[str] = MINIMUM_FIELDS,
 ) -> "OrderedDict[str, Dict[str, str]]":
     full = full_payload(ticket)
-    minimum = minimum_payload(ticket)
+    minimum = minimum_payload(ticket, minimum_fields)
     return OrderedDict(
         [
             ("full_context", full),
@@ -188,12 +269,31 @@ def calculate_variant_metrics(
             item.prediction != full_prediction
             for item, full_prediction in zip(runs, full_predictions)
         )
+        improvements = sum(
+            full_item.prediction != full_item.expected
+            and item.prediction == item.expected
+            for item, full_item in zip(runs, full_runs)
+        )
+        regressions = sum(
+            full_item.prediction == full_item.expected
+            and item.prediction != item.expected
+            for item, full_item in zip(runs, full_runs)
+        )
+        other_changes = sum(
+            item.prediction != full_item.prediction
+            and (item.prediction == item.expected)
+            == (full_item.prediction == full_item.expected)
+            for item, full_item in zip(runs, full_runs)
+        )
         total = len(runs)
         metrics[variant] = {
             "correct": correct,
             "total": total,
             "accuracy": round(correct / total, 6) if total else 0.0,
             "decision_changes_vs_full": changes,
+            "improvements_vs_full": improvements,
+            "regressions_vs_full": regressions,
+            "other_changes_vs_full": other_changes,
             "decision_stability_vs_full": round(1 - (changes / total), 6) if total else 0.0,
             "input_tokens": tokens,
             "token_reduction_vs_full": _reduction(tokens, full_tokens),
@@ -230,19 +330,28 @@ def run_benchmark(
     model: str = "gpt-4o-mini",
     engine: str = "auto",
     masker_name: str = "structured",
-    data_path: Path = DATA_PATH,
+    data_path: Path | None = None,
+    corpus_name: str = "synthetic",
 ) -> Dict[str, Any]:
-    tickets = load_tickets(data_path)
+    profile = get_corpus_profile(corpus_name)
+    effective_data_path = data_path or profile.data_path
+    tickets = load_tickets(effective_data_path)
     use_openai = _resolve_engine(engine)
     masker = _make_masker(masker_name)
     observations: Dict[str, List[Observation]] = {name: [] for name in VARIANT_NAMES}
 
     for ticket in tickets:
-        for variant, outgoing_payload in build_variant_payloads(ticket, masker).items():
+        for variant, outgoing_payload in build_variant_payloads(
+            ticket,
+            masker,
+            minimum_fields=profile.minimum_fields,
+        ).items():
             result = classify_measured(
                 outgoing_payload,
                 model=model,
                 use_openai=use_openai,
+                labels=profile.labels,
+                task_name=profile.task_name,
             )
             observations[variant].append(
                 Observation(
@@ -256,7 +365,11 @@ def run_benchmark(
                         ticket,
                         outgoing_payload,
                     ),
-                    prompt=_build_prompt(outgoing_payload),
+                    prompt=_build_prompt(
+                        outgoing_payload,
+                        labels=profile.labels,
+                        task_name=profile.task_name,
+                    ),
                 )
             )
 
@@ -266,8 +379,7 @@ def run_benchmark(
     }
     evidence_level = "real_model_run" if use_openai else "technical_dry_run"
     limitations = [
-        "The corpus is small, synthetic, and specific to support-ticket routing.",
-        "The same engineering corpus was used to design and evaluate the allowlist; there is no independent holdout set yet.",
+        *profile.limitations,
         "Results are bounded to this corpus, prompt, model configuration, and run.",
         "No result is a legal conclusion or a universal proof that a field never matters.",
     ]
@@ -275,6 +387,10 @@ def run_benchmark(
         limitations.append(
             "The offline classifier is deterministic plumbing validation, not evidence about an LLM's data needs."
         )
+        if profile.name == "banking77":
+            limitations.append(
+                "The offline classifier does not implement BANKING77 intent labels, so its accuracy is not a task result."
+            )
     if masker.name == "structured_field_masking":
         limitations.append(
             "The masking condition uses declared structured fields and is not an OpenAI Privacy Filter evaluation."
@@ -287,27 +403,45 @@ def run_benchmark(
             for item in runs
         }
     )
+    metrics = calculate_variant_metrics(observations)
+    if not use_openai:
+        for metric in metrics.values():
+            metric["accepted_without_review"] = False
     return {
         "run": {
+            "corpus_name": profile.name,
+            "corpus_description": profile.description,
+            "public_source_data": profile.public_source_data,
+            "synthetic_identity_overlay": profile.synthetic_identity_overlay,
+            "fully_synthetic": profile.fully_synthetic,
+            "source_url": profile.source_url,
+            "license": profile.license,
+            "labels": list(profile.labels),
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "evidence_level": evidence_level,
             "engine": f"openai:{model}" if use_openai else "offline_rule_based",
             "model": model if use_openai else None,
             "masker": masker.name,
             "test_set_size": len(tickets),
-            "corpus": str(data_path),
-            "corpus_sha256": _sha256_bytes(data_path.read_bytes()),
-            "prompt_sha256": _sha256_bytes(_build_prompt({}).encode("utf-8")),
+            "corpus": str(effective_data_path),
+            "corpus_sha256": _sha256_bytes(effective_data_path.read_bytes()),
+            "prompt_sha256": _sha256_bytes(
+                _build_prompt(
+                    {},
+                    labels=profile.labels,
+                    task_name=profile.task_name,
+                ).encode("utf-8")
+            ),
             "token_sources": token_sources,
-            "synthetic_data": True,
+            "synthetic_data": profile.fully_synthetic,
         },
         "variant_definitions": {
             "full_context": "All declared record fields.",
             "masking_only": "Full record with the selected masking layer applied.",
-            "minimum_context": f"Only the allowlisted fields: {', '.join(MINIMUM_FIELDS)}.",
+            "minimum_context": f"Only the allowlisted fields: {', '.join(profile.minimum_fields)}.",
             "minimum_plus_masking": "Minimum context with the selected masking layer applied to remaining text.",
         },
-        "metrics": calculate_variant_metrics(observations),
+        "metrics": metrics,
         "observations": serialised_observations,
         "limitations": limitations,
     }
@@ -333,6 +467,23 @@ def render_markdown(report: Mapping[str, Any]) -> str:
     elif run["masker"] == "openai_privacy_filter":
         masker_note = "\n> The masking conditions use `openai/privacy-filter`.\n"
 
+    provenance_lines = []
+    if run.get("corpus_description"):
+        provenance_lines.append(f"- Corpus: {run['corpus_description']}")
+    if run.get("public_source_data"):
+        provenance_lines.extend(
+            [
+                f"- Public source: {run['source_url']}",
+                f"- Dataset license: `{run['license']}`",
+            ]
+        )
+    if run.get("synthetic_identity_overlay"):
+        provenance_lines.append(
+            "- Data provenance: Public queries and original labels with a synthetic structured identity overlay"
+        )
+    elif run.get("fully_synthetic"):
+        provenance_lines.append("- Data provenance: Fully synthetic records and labels")
+
     lines = [
         "# Necessity Certificate Benchmark Report",
         "",
@@ -345,14 +496,15 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         f"- Engine: `{run['engine']}`",
         f"- Model: `{run.get('model') or 'not applicable'}`",
         f"- Masker: `{run['masker']}`",
-        f"- Synthetic cases: `{run['test_set_size']}`",
+        f"- Evaluation cases: `{run['test_set_size']}`",
+        *provenance_lines,
         f"- Corpus SHA-256: `{run['corpus_sha256']}`",
         f"- Prompt SHA-256: `{run['prompt_sha256']}`",
         "",
         "## Results",
         "",
-        "| Variant | Correct | Accuracy | Changes vs full | Input tokens | Token reduction | Field reduction | Raw structured PII sent | Raw PII reduction | Accepted |",
-        "|---|---:|---:|---:|---:|---:|---:|---:|---:|:---:|",
+        "| Variant | Correct | Accuracy | Changes vs full | Improvements | Regressions | Input tokens | Token reduction | Field reduction | Raw structured PII sent | Raw PII reduction | Accepted |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|",
     ]
     labels = {
         "full_context": "Full context",
@@ -362,12 +514,14 @@ def render_markdown(report: Mapping[str, Any]) -> str:
     }
     for variant, metric in report["metrics"].items():
         lines.append(
-            "| {label} | {correct}/{total} | {accuracy} | {changes} | {tokens} | {token_reduction} | {field_reduction} | {raw_pii} | {pii_reduction} | {accepted} |".format(
+            "| {label} | {correct}/{total} | {accuracy} | {changes} | {improvements} | {regressions} | {tokens} | {token_reduction} | {field_reduction} | {raw_pii} | {pii_reduction} | {accepted} |".format(
                 label=labels.get(variant, variant),
                 correct=metric["correct"],
                 total=metric["total"],
                 accuracy=_percent(metric["accuracy"]),
                 changes=metric["decision_changes_vs_full"],
+                improvements=metric.get("improvements_vs_full", 0),
+                regressions=metric.get("regressions_vs_full", 0),
                 tokens=metric["input_tokens"],
                 token_reduction=_percent(metric["token_reduction_vs_full"]),
                 field_reduction=_percent(metric["field_reduction_vs_full"]),
@@ -385,6 +539,7 @@ def render_markdown(report: Mapping[str, Any]) -> str:
             "- `minimum_context` versus `full_context` measures the contribution of purpose-specific minimization.",
             "- `minimum_plus_masking` versus `masking_only` measures the additional reduction from minimization when a masking layer is already present.",
             "- A minimized condition is accepted without review only when it causes zero individual decision changes and does not reduce ground-truth correctness.",
+            "- Improvements and regressions distinguish beneficial decision changes from harmful ones; the strict no-change rule still routes every change to review.",
             "",
             "## Limitations",
             "",
@@ -408,6 +563,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", default="gpt-4o-mini")
     parser.add_argument(
+        "--corpus",
+        choices=tuple(CORPUS_PROFILES),
+        default="synthetic",
+        help="select the fully synthetic demo or public BANKING77-derived subset",
+    )
+    parser.add_argument(
         "--engine",
         choices=("auto", "offline", "openai"),
         default="auto",
@@ -419,21 +580,26 @@ def main() -> None:
         default="structured",
         help="opf loads the actual openai/privacy-filter model",
     )
-    parser.add_argument("--data", type=Path, default=DATA_PATH)
-    parser.add_argument("--out-json", type=Path, default=DEFAULT_JSON_PATH)
-    parser.add_argument("--out-markdown", type=Path, default=DEFAULT_MARKDOWN_PATH)
+    parser.add_argument("--data", type=Path)
+    parser.add_argument("--out-json", type=Path)
+    parser.add_argument("--out-markdown", type=Path)
     args = parser.parse_args()
+
+    default_json_path, default_markdown_path = get_default_report_paths(args.corpus)
+    json_path = args.out_json or default_json_path
+    markdown_path = args.out_markdown or default_markdown_path
 
     report = run_benchmark(
         model=args.model,
         engine=args.engine,
         masker_name=args.masker,
         data_path=args.data,
+        corpus_name=args.corpus,
     )
-    write_reports(report, args.out_json, args.out_markdown)
+    write_reports(report, json_path, markdown_path)
     print(render_markdown(report))
-    print(f"JSON evidence written to {args.out_json}")
-    print(f"Markdown certificate written to {args.out_markdown}")
+    print(f"JSON evidence written to {json_path}")
+    print(f"Markdown certificate written to {markdown_path}")
 
 
 if __name__ == "__main__":

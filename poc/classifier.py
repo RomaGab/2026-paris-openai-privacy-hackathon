@@ -10,7 +10,7 @@ from __future__ import annotations
 import os
 import re
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict, Optional, Sequence
 
 QUEUES = [
     "billing",
@@ -89,29 +89,61 @@ def classify_rule_based(record: Dict[str, str]) -> str:
     return "general_inquiry"
 
 
-def _build_prompt(record: Dict[str, str]) -> str:
+def _extract_label(text: str, labels: Sequence[str]) -> Optional[str]:
+    """Extract one complete declared label from a model response."""
+    normalized = text.strip().lower()
+    canonical = {label.lower(): label for label in labels}
+    if normalized in canonical:
+        return canonical[normalized]
+    for label in sorted(labels, key=len, reverse=True):
+        pattern = rf"(?<![a-z0-9_]){re.escape(label.lower())}(?![a-z0-9_])"
+        if re.search(pattern, normalized):
+            return label
+    return None
+
+
+def _build_prompt(
+    record: Dict[str, str],
+    labels: Sequence[str] = QUEUES,
+    task_name: str = "support ticket router",
+) -> str:
     present_fields = "\n".join(f"- {k}: {v}" for k, v in record.items() if v is not None)
+    label_list = ", ".join(labels)
+    if tuple(labels) == tuple(QUEUES) and task_name == "support ticket router":
+        instruction = (
+            "You are a support ticket router. Given the fields below, reply with "
+            f"exactly one queue name from this list: {label_list}. "
+            "Reply with the queue name only, nothing else."
+        )
+    else:
+        instruction = (
+            f"You are a {task_name}. Given the fields below, reply with exactly "
+            f"one label from this list: {label_list}. "
+            "Reply with the label only, nothing else."
+        )
     return (
-        "You are a support ticket router. Given the fields below, reply with "
-        f"exactly one queue name from this list: {', '.join(QUEUES)}. "
-        "Reply with the queue name only, nothing else.\n\n"
-        f"Fields:\n{present_fields}"
+        f"{instruction}\n\nFields:\n{present_fields}"
     )
 
 
-def classify_openai_measured(record: Dict[str, str], model: str) -> ClassificationResult:
+def classify_openai_measured(
+    record: Dict[str, str],
+    model: str,
+    labels: Sequence[str] = QUEUES,
+    task_name: str = "support ticket router",
+) -> ClassificationResult:
     from openai import OpenAI  # imported lazily so the offline path has no hard dependency
 
     client = OpenAI()
-    prompt = _build_prompt(record)
+    prompt = _build_prompt(record, labels=labels, task_name=task_name)
     response = client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": prompt}],
         temperature=0,
     )
-    text = (response.choices[0].message.content or "").strip().lower()
-    match = re.search("|".join(QUEUES), text)
-    prediction = match.group(0) if match else "general_inquiry"
+    text = (response.choices[0].message.content or "").strip()
+    match = _extract_label(text, labels)
+    prediction = match if match is not None else "__invalid__"
     usage = getattr(response, "usage", None)
     api_tokens = getattr(usage, "prompt_tokens", None) if usage else None
     if api_tokens is not None:
@@ -120,21 +152,38 @@ def classify_openai_measured(record: Dict[str, str], model: str) -> Classificati
     return ClassificationResult(prediction, token_count, token_source)
 
 
-def classify_openai(record: Dict[str, str], model: str) -> str:
-    return classify_openai_measured(record, model).prediction
+def classify_openai(
+    record: Dict[str, str],
+    model: str,
+    labels: Sequence[str] = QUEUES,
+    task_name: str = "support ticket router",
+) -> str:
+    return classify_openai_measured(
+        record,
+        model,
+        labels=labels,
+        task_name=task_name,
+    ).prediction
 
 
 def classify_measured(
     record: Dict[str, str],
     model: str = "gpt-4o-mini",
     use_openai: Optional[bool] = None,
+    labels: Sequence[str] = QUEUES,
+    task_name: str = "support ticket router",
 ) -> ClassificationResult:
     """Classify one record and return its input-token accounting evidence."""
     if use_openai is None:
         use_openai = bool(os.environ.get("OPENAI_API_KEY"))
     if use_openai:
-        return classify_openai_measured(record, model)
-    prompt = _build_prompt(record)
+        return classify_openai_measured(
+            record,
+            model,
+            labels=labels,
+            task_name=task_name,
+        )
+    prompt = _build_prompt(record, labels=labels, task_name=task_name)
     token_count, token_source = count_tokens_with_source(prompt, model=model)
     return ClassificationResult(
         classify_rule_based(record),
@@ -143,8 +192,20 @@ def classify_measured(
     )
 
 
-def classify(record: Dict[str, str], model: str = "gpt-4o-mini", use_openai: Optional[bool] = None) -> str:
-    return classify_measured(record, model=model, use_openai=use_openai).prediction
+def classify(
+    record: Dict[str, str],
+    model: str = "gpt-4o-mini",
+    use_openai: Optional[bool] = None,
+    labels: Sequence[str] = QUEUES,
+    task_name: str = "support ticket router",
+) -> str:
+    return classify_measured(
+        record,
+        model=model,
+        use_openai=use_openai,
+        labels=labels,
+        task_name=task_name,
+    ).prediction
 
 
 def count_tokens_with_source(text: str, model: str = "gpt-4o-mini") -> tuple[int, str]:

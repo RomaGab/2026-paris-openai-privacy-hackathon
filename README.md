@@ -100,6 +100,9 @@ All displayed measurements are real and reproducible. The demonstration data is 
 The `poc/` folder implements two complementary measurement paths using synthetic ticket routing:
 
 - `poc/data/synthetic_tickets.json`: 16 synthetic support tickets with the declared fields and an expected queue.
+- `poc/data/banking77_test_subset.json`: 50 public BANKING77 test queries across 10 original intent labels, with an explicitly synthetic structured identity overlay.
+- `poc/data/banking77_test_subset.meta.json`: source URL, CC BY 4.0 attribution, source hash, sampling seed, selected intents, and selection method.
+- `poc/banking77_corpus.py`: deterministic preparation script for reproducing the public subset from the official test CSV.
 - `poc/classifier.py`: the routing task. Uses the OpenAI API when `OPENAI_API_KEY` is set, otherwise falls back to a deterministic offline classifier so the demo runs with no key.
 - `poc/minimize.py`: runs per-field counterfactual ablations. A field is recommended for blocking only when its removal causes zero individual decision changes.
 - `poc/benchmark.py`: compares full context, masking alone, minimum context, and minimum context plus masking. It exports exact observations, utility scores, data-reduction measures, and limitations to JSON and Markdown.
@@ -125,6 +128,20 @@ python poc/benchmark.py --engine openai --model gpt-4o-mini --masker opf
 ```
 
 The first OPF execution may download model weights, so cache them before a live demo. See [BENCHMARK.md](BENCHMARK.md) for the experimental design, formulas, acceptance rule, report schema, and claim boundaries. See [BENCHMARK_RESULTS.md](BENCHMARK_RESULTS.md) for the first recorded real-model iterations, including one rejected candidate contract and one accepted prototype contract.
+
+Run the independent public-data validation after setting `OPENAI_API_KEY`:
+
+```bash
+python poc/benchmark.py \
+  --corpus banking77 \
+  --engine openai \
+  --model gpt-4o-mini \
+  --masker structured
+```
+
+This is a fixed 50-case, 10-intent BANKING77-derived subset evaluation, not a full BANKING77 benchmark result. The queries and ground-truth labels come from the public test split. All structured identity fields are synthetic. Dataset attribution and reproduction instructions are recorded in [BENCHMARK.md](BENCHMARK.md).
+
+The first recorded public-data run withheld all 300 raw structured identity values, reduced API-reported input tokens by 41.9%, and changed exact-match accuracy from 44/50 to 45/50. The single changed decision corrected a full-context error and introduced no regression. The strict certificate nevertheless routes the changed case to review. Full evidence and limitations are recorded in [BENCHMARK_RESULTS.md](BENCHMARK_RESULTS.md).
 
 The per-field ablation remains available:
 

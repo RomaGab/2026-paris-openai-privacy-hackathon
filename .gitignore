@@ -4,6 +4,8 @@ __pycache__/
 poc/report.json
 poc/benchmark-report.json
 poc/benchmark-report.md
+poc/banking77-benchmark-report.json
+poc/banking77-benchmark-report.md
 poc/step_a_output.sql
 poc/leakage_report.json
 demo/storyboard_frames/

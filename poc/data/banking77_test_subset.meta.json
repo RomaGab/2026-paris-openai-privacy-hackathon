@@ -1,0 +1,27 @@
+{
+  "dataset": "BANKING77",
+  "source_url": "https://raw.githubusercontent.com/PolyAI-LDN/task-specific-datasets/master/banking_data/test.csv",
+  "source_split": "test",
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "citation": "Casanueva, Temcinas, Gerz, Henderson, and Vulic. Efficient Intent Detection with Dual Sentence Encoders. ACL 2020.",
+  "source_sha256": "d12d6e3bc4c3103966ae786dc435913c0c563dfa328f5a3646d0e62cfeeb474d",
+  "selection_method": "lowest SHA-256 ranks per intent",
+  "selection_seed": "necessity-certificate-2026-09-03",
+  "selected_intents": [
+    "card_arrival",
+    "cash_withdrawal_not_recognised",
+    "compromised_card",
+    "contactless_not_working",
+    "declined_transfer",
+    "passcode_forgotten",
+    "request_refund",
+    "transfer_not_received_by_recipient",
+    "verify_my_identity",
+    "wrong_exchange_rate_for_cash_withdrawal"
+  ],
+  "examples_per_intent": 5,
+  "selected_examples": 50,
+  "synthetic_identity_overlay": true,
+  "ground_truth": "Original BANKING77 intent labels"
+}

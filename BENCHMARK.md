@@ -39,6 +39,32 @@ The current corpus contains 16 synthetic cases. Results should therefore always 
 
 The current corpus is an engineering corpus used both to design and evaluate the allowlist. It is not an independent holdout set. A production evaluation should freeze the contract and validate it on separate representative cases, with repeated model runs where nondeterminism matters.
 
+### Public holdout validation
+
+The repository also contains a fixed 50-case subset from the official BANKING77 test split. BANKING77 contains 13,083 labelled banking-support queries across 77 intents. This evaluation selects 5 examples from each of 10 declared intents by stable SHA-256 ranking with a published seed.
+
+The public query and original intent label are preserved. Six unmistakably synthetic identity fields are added to each record so no real personal data is introduced merely to test privacy controls. The minimum payload contains only `issue_description` because the original BANKING77 intent task depends on the query, not on the synthetic identity overlay.
+
+This must be described as a **fixed BANKING77-derived subset evaluation**, not a full BANKING77 benchmark result.
+
+Sources and reproducibility:
+
+- Dataset: [BANKING77 on Hugging Face](https://huggingface.co/datasets/PolyAI/banking77)
+- Original data repository: [PolyAI task-specific datasets](https://github.com/PolyAI-LDN/task-specific-datasets/tree/master/banking_data)
+- Paper: [Efficient Intent Detection with Dual Sentence Encoders](https://aclanthology.org/2020.nlp4convai-1.5/)
+- License: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- Committed subset: `poc/data/banking77_test_subset.json`
+- Source hash and selection manifest: `poc/data/banking77_test_subset.meta.json`
+
+To reproduce the committed subset from the official test CSV:
+
+```bash
+curl -fsSL \
+  https://raw.githubusercontent.com/PolyAI-LDN/task-specific-datasets/master/banking_data/test.csv \
+  -o /tmp/banking77-test.csv
+python poc/banking77_corpus.py /tmp/banking77-test.csv
+```
+
 ## Metrics
 
 ### Task utility
@@ -47,9 +73,13 @@ The current corpus is an engineering corpus used both to design and evaluate the
 accuracy = correct predictions / total cases
 
 decision stability = 1 - decisions changed versus full context / total cases
+
+improvements = full-context errors corrected by the variant
+
+regressions = full-context correct decisions made incorrect by the variant
 ```
 
-Accuracy is evaluated against the declared ground truth. Decision stability detects behavioral changes that aggregate accuracy alone can hide.
+Accuracy is evaluated against the declared ground truth. Decision stability detects behavioral changes that aggregate accuracy alone can hide. Improvements and regressions distinguish helpful changes from harmful ones, while the strict certificate rule still sends every changed decision to review.
 
 ### Data reduction
 
@@ -110,6 +140,31 @@ python poc/benchmark.py --engine openai --model gpt-4o-mini --masker opf
 
 The first execution may download the Privacy Filter model. Do not rely on that download during the live showcase.
 
+### 4. Public BANKING77-derived validation
+
+Run the report plumbing without making a model claim:
+
+```bash
+python poc/benchmark.py --corpus banking77 --engine offline --masker structured
+```
+
+The offline fallback does not implement BANKING77 intents. Its accuracy is deliberately excluded from model evidence.
+
+Run the real public-data evaluation:
+
+```bash
+python poc/benchmark.py \
+  --corpus banking77 \
+  --engine openai \
+  --model gpt-4o-mini \
+  --masker structured
+```
+
+This writes separate ignored artifacts:
+
+- `poc/banking77-benchmark-report.json`
+- `poc/banking77-benchmark-report.md`
+
 ## Generated evidence
 
 Every run writes two ignored local artifacts:
@@ -149,7 +204,9 @@ The first recorded real-model result and the rejected candidate that preceded it
 - Do not use the offline classifier as LLM evidence.
 - Do not present supplier-leak probabilities as measurements.
 - Do not claim differential privacy without an implemented privacy mechanism, privacy accounting, and a measured utility result.
-- Always show that the corpus is synthetic and that the findings are task-specific.
+- Always show the exact corpus provenance and that the findings are task-specific.
+- For the public profile, state that the queries and labels are public BANKING77 data while the structured identity overlay is synthetic.
+- Do not describe the 50-case, 10-intent subset as a full BANKING77 benchmark result.
 
 ## Pitch sentence
 
