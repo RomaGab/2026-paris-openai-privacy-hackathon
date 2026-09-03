@@ -175,4 +175,3 @@ Expected: JSON and Markdown reports are written and labelled `TECHNICAL DRY RUN`
 Run: `git diff --check && git status --short`
 
 Expected: no whitespace errors and only intended files changed.
-

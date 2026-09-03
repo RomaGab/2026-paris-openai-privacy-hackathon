@@ -69,4 +69,3 @@ python poc/benchmark.py --engine openai --model gpt-4o-mini --masker structured
 ```
 
 The generated JSON contains each exact payload, prompt, prediction, expected label, and token count. Generated reports remain ignored by Git to avoid accidentally committing future evaluation records.
-
